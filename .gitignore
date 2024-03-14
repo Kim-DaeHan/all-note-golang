@@ -1,0 +1,40 @@
+# Compiled Go binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of the `go` command
+/bin/
+/pkg/
+
+# Output of the `gin` web server
+/gin-bin/
+
+# Dependency directories (go modules)
+/vendor/
+/go.sum
+/go.mod
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Log files
+log/
+
+# Environment-specific files
+.env
+
+# Binary files
+*.dat
+
+# Compiled HTML templates
+/templates/*.html
+
+# Configuration files
+/config/app_config.yaml
