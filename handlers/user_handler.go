@@ -18,7 +18,7 @@ func GetAllUser(c *gin.Context) {
 		customErr, ok := err.(*errors.CustomError)
 		if ok {
 			statusCode := customErr.Status()
-			c.JSON(statusCode, gin.H{"message": err.Error()})
+			c.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
 			return
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
