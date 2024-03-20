@@ -26,7 +26,7 @@ func GetAllUser(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "Data": users})
+	c.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": users})
 }
 
 // // 다른 컨트롤러 함수들을 여기에 추가할 수 있습니다.
