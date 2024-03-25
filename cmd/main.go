@@ -6,12 +6,15 @@ import (
 
 	"github.com/Kim-DaeHan/all-note-golang/database"
 	"github.com/Kim-DaeHan/all-note-golang/routes"
+	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	gin.SetMode(gin.DebugMode)
+	// gin.SetMode(gin.ReleaseMode)
 
 	// .env 파일 로딩
 	err := godotenv.Load()
@@ -20,6 +23,11 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	// CORS 설정
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"} // 모든 오리진 허용
+	router.Use(cors.New(config))
 
 	//run database
 	db := database.ConnectDB()
