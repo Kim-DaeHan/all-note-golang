@@ -5,10 +5,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(router *gin.RouterGroup) {
+type UserRoutes struct {
+	userHandler handlers.UserHandler
+}
+
+func NewUserRoutes(userHandler handlers.UserHandler) UserRoutes {
+	return UserRoutes{userHandler}
+}
+
+func (ur *UserRoutes) SetUserRoutes(router *gin.RouterGroup) {
 	users := router.Group("/users")
-	{
-		users.GET("/", handlers.GetAllUser)
-		users.POST("/", handlers.CreateUser)
-	}
+
+	users.GET("/", ur.userHandler.GetAllUser)
+	users.POST("/", ur.userHandler.CreateUser)
+
 }
