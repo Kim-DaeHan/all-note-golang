@@ -59,7 +59,7 @@ func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneRe
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	fmt.Printf("user: %+v", dto)
+	fmt.Printf("dto: %+v", dto)
 
 	user := models.User{
 		ID:        primitive.NewObjectID(),
@@ -69,8 +69,8 @@ func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneRe
 		Verified:  dto.Verified,
 		Provider:  dto.Provider,
 		Photo:     dto.Photo,
-		CreatedAt: primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
-		UpdatedAt: primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	fmt.Printf("user: %+v", user)
@@ -88,7 +88,7 @@ func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneRe
 	return result, nil
 }
 
-func (us *UserServiceImpl) UpsertUser(dto dto.UserUpdateDTO) (*models.User, error) {
+func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -99,13 +99,12 @@ func (us *UserServiceImpl) UpsertUser(dto dto.UserUpdateDTO) (*models.User, erro
 		"verified":   dto.Verified,
 		"provider":   dto.Provider,
 		"photo":      dto.Photo,
-		"created_at": primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
-		"updated_at": primitive.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
+		"updated_at": time.Now(),
 	}
 
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(1)
 	query := bson.D{{Key: "email", Value: dto.Email}}
-	update := bson.D{{Key: "$set", Value: user}}
+	update := bson.D{{Key: "$set", Value: user}, {Key: "$setOnInsert", Value: bson.M{"create_at": time.Now()}}}
 	res := us.collection.FindOneAndUpdate(ctx, query, update, opts)
 
 	var updatedUser *models.User

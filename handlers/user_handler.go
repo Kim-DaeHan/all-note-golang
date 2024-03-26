@@ -87,7 +87,7 @@ func (uh *UserHandler) UpsertUser(c *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.UpsertUser(dto)
+	result, err := uh.userService.UpsertUser(&dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
