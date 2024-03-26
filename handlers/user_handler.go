@@ -71,3 +71,36 @@ func (uh *UserHandler) CreateUser(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
 }
+
+func (uh *UserHandler) UpsertUser(c *gin.Context) {
+	var dto dto.UserUpdateDTO
+
+	//validate the request body
+	if err := c.BindJSON(&dto); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	//use the validator library to validate required fields
+	if validationErr := validate.Struct(&dto); validationErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": validationErr.Error()})
+		return
+	}
+
+	result, err := uh.userService.UpsertUser(dto.Email, dto)
+
+	if err != nil {
+		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
+		customErr, ok := err.(*errors.CustomError)
+		if ok {
+			statusCode := customErr.Status()
+			c.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
+}

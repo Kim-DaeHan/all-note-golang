@@ -18,5 +18,6 @@ func (ur *UserRoutes) SetUserRoutes(router *gin.RouterGroup) {
 
 	users.GET("/", ur.userHandler.GetAllUser)
 	users.POST("/", ur.userHandler.CreateUser)
+	users.POST("/upsert", ur.userHandler.UpsertUser)
 
 }
