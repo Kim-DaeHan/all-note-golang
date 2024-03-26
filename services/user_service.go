@@ -9,5 +9,5 @@ import (
 type UserService interface {
 	GetAllUser() ([]models.User, error)
 	CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneResult, error)
-	UpsertUser(email string, dto dto.UserUpdateDTO) (*models.User, error)
+	UpsertUser(dto dto.UserUpdateDTO) (*models.User, error)
 }

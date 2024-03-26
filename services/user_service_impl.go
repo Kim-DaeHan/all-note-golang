@@ -88,7 +88,7 @@ func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneRe
 	return result, nil
 }
 
-func (us *UserServiceImpl) UpsertUser(email string, dto dto.UserUpdateDTO) (*models.User, error) {
+func (us *UserServiceImpl) UpsertUser(dto dto.UserUpdateDTO) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -104,7 +104,7 @@ func (us *UserServiceImpl) UpsertUser(email string, dto dto.UserUpdateDTO) (*mod
 	}
 
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(1)
-	query := bson.D{{Key: "email", Value: email}}
+	query := bson.D{{Key: "email", Value: dto.Email}}
 	update := bson.D{{Key: "$set", Value: user}}
 	res := us.collection.FindOneAndUpdate(ctx, query, update, opts)
 
