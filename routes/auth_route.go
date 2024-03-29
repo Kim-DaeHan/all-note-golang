@@ -17,5 +17,7 @@ func (ar *AuthRoutes) SetAuthRoutes(router *gin.RouterGroup) {
 	auths := router.Group("/auth")
 
 	auths.GET("/google", ar.authHandler.GoogleOAuth)
+	auths.GET("/logout", ar.authHandler.LogoutUser)
+	// auths.GET("/users")
 
 }

@@ -105,3 +105,11 @@ func (ac *AuthHandler) GoogleOAuth(c *gin.Context) {
 
 	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprint(os.Getenv("CLIENT_ORIGIN"), pathUrl))
 }
+
+func (ac *AuthHandler) LogoutUser(c *gin.Context) {
+	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("logged_in", "", -1, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
+}
