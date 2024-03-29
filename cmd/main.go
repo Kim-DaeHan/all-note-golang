@@ -26,7 +26,9 @@ func main() {
 
 	// CORS 설정
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"} // 모든 오리진 허용
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	// config.AllowAllOrigins = true // 모든 오리진 허용
+	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
 	//run database

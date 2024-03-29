@@ -55,6 +55,36 @@ func (us *UserServiceImpl) GetAllUser() ([]models.User, error) {
 	return users, nil
 }
 
+func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, &errors.CustomError{
+			Message:    "잘못된 ID 형식",
+			StatusCode: http.StatusBadRequest,
+			Err:        err,
+		}
+	}
+
+	var users *models.User
+
+	query := bson.M{"_id": objID}
+
+	err = us.collection.FindOne(ctx, query).Decode(&users)
+
+	if err != nil {
+		return nil, &errors.CustomError{
+			Message:    "내부 서버 오류",
+			StatusCode: http.StatusInternalServerError,
+			Err:        err,
+		}
+	}
+
+	return users, nil
+}
+
 func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

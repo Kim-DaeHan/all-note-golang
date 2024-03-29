@@ -28,7 +28,7 @@ func SetupRoutes(router *gin.Engine) {
 	apiGroup := router.Group("/api")
 
 	userRoute.SetUserRoutes(apiGroup)
-	authRoute.SetAuthRoutes(apiGroup)
+	authRoute.SetAuthRoutes(apiGroup, userCollection)
 
 }
 

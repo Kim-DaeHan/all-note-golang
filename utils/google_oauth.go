@@ -51,6 +51,7 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 	}
 
 	res, err := client.Do(req)
+
 	if err != nil {
 		return nil, err
 	}

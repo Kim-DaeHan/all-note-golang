@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Kim-DaeHan/all-note-golang/dto"
+	"github.com/Kim-DaeHan/all-note-golang/models"
 	"github.com/Kim-DaeHan/all-note-golang/services"
 	"github.com/Kim-DaeHan/all-note-golang/utils"
 	"github.com/gin-gonic/gin"
@@ -21,16 +22,16 @@ func NewAuthController(userService services.UserService) AuthHandler {
 	return AuthHandler{userService}
 }
 
-func (ac *AuthHandler) GoogleOAuth(c *gin.Context) {
-	code := c.Query("code")
+func (ac *AuthHandler) GoogleOAuth(ctx *gin.Context) {
+	code := ctx.Query("code")
 	var pathUrl string = "/"
 
-	if c.Query("state") != "" {
-		pathUrl = c.Query("state")
+	if ctx.Query("state") != "" {
+		pathUrl = ctx.Query("state")
 	}
 
 	if code == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Authorization code not provided!"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Authorization code not provided!"})
 		return
 	}
 
@@ -38,13 +39,13 @@ func (ac *AuthHandler) GoogleOAuth(c *gin.Context) {
 	tokenRes, err := utils.GetGoogleOauthToken(code)
 
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	user, err := utils.GetGoogleUser(tokenRes.Access_token, tokenRes.Id_token)
 
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	fmt.Printf("user: %+v", user)
@@ -60,56 +61,63 @@ func (ac *AuthHandler) GoogleOAuth(c *gin.Context) {
 
 	updatedUser, err := ac.userService.UpsertUser(resBody)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	accessExpiredInStr := os.Getenv("ACCESS_TOKEN_EXPIRED_IN")
 	accessTokenExpiredIn, err := time.ParseDuration(accessExpiredInStr)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	refreshExpiredInStr := os.Getenv("REFRESH_TOKEN_EXPIRED_IN")
 	refreshTokenExpiredIn, err := time.ParseDuration(refreshExpiredInStr)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	// Generate Tokens
 	access_token, err := utils.CreateToken(accessTokenExpiredIn, updatedUser.ID.Hex(), os.Getenv("ACCESS_TOKEN_JWT_SECRET"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
 
 	refresh_token, err := utils.CreateToken(refreshTokenExpiredIn, updatedUser.ID.Hex(), os.Getenv("REFRESH_TOKEN_JWT_SECRET"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
 	accessTokenMaxAgeStr := os.Getenv("ACCESS_TOKEN_MAXAGE")
 	accessTokenMaxAge, err := strconv.Atoi(accessTokenMaxAgeStr)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
 	refreshTokenMaxAgeStr := os.Getenv("REFRESH_TOKEN_MAXAGE")
 	refreshTokenMaxAge, err := strconv.Atoi(refreshTokenMaxAgeStr)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
 
-	c.SetCookie("access_token", access_token, accessTokenMaxAge*60, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", refresh_token, refreshTokenMaxAge*60, "/", "localhost", false, true)
-	c.SetCookie("logged_in", "true", accessTokenMaxAge*60, "/", "localhost", false, false)
+	ctx.SetCookie("access_token", access_token, accessTokenMaxAge*60, "/", "localhost", false, true)
+	ctx.SetCookie("refresh_token", refresh_token, refreshTokenMaxAge*60, "/", "localhost", false, true)
+	ctx.SetCookie("logged_in", "true", accessTokenMaxAge*60, "/", "localhost", false, false)
 
-	c.Redirect(http.StatusTemporaryRedirect, fmt.Sprint(os.Getenv("CLIENT_ORIGIN"), pathUrl))
+	ctx.Redirect(http.StatusTemporaryRedirect, fmt.Sprint(os.Getenv("CLIENT_ORIGIN"), pathUrl))
 }
 
-func (ac *AuthHandler) LogoutUser(c *gin.Context) {
-	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
-	c.SetCookie("logged_in", "", -1, "/", "localhost", false, true)
+func (ac *AuthHandler) LogoutUser(ctx *gin.Context) {
+	ctx.SetCookie("access_token", "", -1, "/", "localhost", false, true)
+	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
+	ctx.SetCookie("logged_in", "", -1, "/", "localhost", false, true)
 
-	c.JSON(http.StatusOK, gin.H{"status": "success"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+}
+
+func (ac *AuthHandler) GetMe(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	fmt.Printf("user: %+v", currentUser)
+	ctx.JSON(http.StatusOK, currentUser)
+
 }
