@@ -22,7 +22,7 @@ func NewAuthController(userService services.UserService) AuthHandler {
 	return AuthHandler{userService}
 }
 
-func (ac *AuthHandler) GoogleOAuth(ctx *gin.Context) {
+func (ah *AuthHandler) GoogleOAuth(ctx *gin.Context) {
 	code := ctx.Query("code")
 	var pathUrl string = "/"
 
@@ -59,7 +59,7 @@ func (ac *AuthHandler) GoogleOAuth(ctx *gin.Context) {
 		Verified: &user.Verified_email,
 	}
 
-	updatedUser, err := ac.userService.UpsertUser(resBody)
+	updatedUser, err := ah.userService.UpsertUser(resBody)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
@@ -107,7 +107,7 @@ func (ac *AuthHandler) GoogleOAuth(ctx *gin.Context) {
 	ctx.Redirect(http.StatusTemporaryRedirect, fmt.Sprint(os.Getenv("CLIENT_ORIGIN"), pathUrl))
 }
 
-func (ac *AuthHandler) LogoutUser(ctx *gin.Context) {
+func (ah *AuthHandler) LogoutUser(ctx *gin.Context) {
 	ctx.SetCookie("access_token", "", -1, "/", "localhost", false, true)
 	ctx.SetCookie("refresh_token", "", -1, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "", -1, "/", "localhost", false, true)
@@ -115,9 +115,54 @@ func (ac *AuthHandler) LogoutUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 
-func (ac *AuthHandler) GetMe(ctx *gin.Context) {
+func (ah *AuthHandler) GetMe(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	fmt.Printf("user: %+v", currentUser)
 	ctx.JSON(http.StatusOK, currentUser)
 
+}
+
+func (ah *AuthHandler) RefreshAccessToken(ctx *gin.Context) {
+	message := "could not refresh access token"
+
+	cookie, err := ctx.Cookie("refresh_token")
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": message})
+		return
+	}
+
+	sub, err := utils.ValidateToken(cookie, os.Getenv("REFRESH_TOKEN_JWT_SECRET"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	user, err := ah.userService.GetUser(sub.(string))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": "the user belonging to this token no logger exists"})
+		return
+	}
+
+	accessExpiredInStr := os.Getenv("ACCESS_TOKEN_EXPIRED_IN")
+	accessTokenExpiredIn, err := time.ParseDuration(accessExpiredInStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+	accessTokenMaxAgeStr := os.Getenv("ACCESS_TOKEN_MAXAGE")
+	accessTokenMaxAge, err := strconv.Atoi(accessTokenMaxAgeStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+
+	access_token, err := utils.CreateToken(accessTokenExpiredIn, user.ID.Hex(), os.Getenv("ACCESS_TOKEN_JWT_SECRET"))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	ctx.SetCookie("access_token", access_token, accessTokenMaxAge*60, "/", "localhost", false, true)
+	ctx.SetCookie("logged_in", "true", accessTokenMaxAge*60, "/", "localhost", false, false)
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token})
 }

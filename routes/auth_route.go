@@ -21,5 +21,5 @@ func (ar *AuthRoutes) SetAuthRoutes(router *gin.RouterGroup, collection *mongo.C
 	auths.GET("/google", ar.authHandler.GoogleOAuth)
 	auths.GET("/logout", ar.authHandler.LogoutUser)
 	auths.GET("/users", middleware.DeserializeUser(collection), ar.authHandler.GetMe)
-
+	auths.GET("/refresh", ar.authHandler.RefreshAccessToken)
 }
