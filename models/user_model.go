@@ -14,6 +14,7 @@ type User struct {
 	Verified  *bool              `bson:"verified,omitempty" json:"verified,omitempty"`
 	Provider  string             `bson:"provider" json:"provider"`
 	Photo     string             `bson:"photo" json:"photo"`
+	Team      primitive.ObjectID `bson:"team,omitempty" json:"team,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
