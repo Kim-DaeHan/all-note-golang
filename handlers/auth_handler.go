@@ -26,6 +26,11 @@ func (ah *AuthHandler) GoogleOAuth(ctx *gin.Context) {
 	code := ctx.Query("code")
 	var pathUrl string = "/"
 
+	fullURL := ctx.Request.URL.String()
+
+	fmt.Println("code: ", code)
+	fmt.Println("fullUrl: ", fullURL)
+
 	if ctx.Query("state") != "" {
 		pathUrl = ctx.Query("state")
 	}
