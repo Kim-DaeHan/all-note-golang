@@ -38,3 +38,9 @@ log/
 
 # Configuration files
 /config/app_config.yaml
+
+# swagger
+/docs/
+
+# air
+/tmp/
