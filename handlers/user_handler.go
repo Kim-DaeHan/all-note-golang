@@ -20,6 +20,16 @@ func NewUserController(userService services.UserService) UserHandler {
 
 var validate = validator.New()
 
+// GetAllUser godoc
+// @Summary 요약 기재
+// @Description 상세한 설명 기재
+// @name get-string-by-int
+// @Accept  json
+// @Produce  json
+// @Param name path string true "User name"
+// @Router /api/users [get]
+// @Success 200 {object} models.User
+// @Failure 400
 func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 	users, err := uh.userService.GetAllUser()
 
