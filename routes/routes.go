@@ -6,6 +6,7 @@ import (
 	"github.com/Kim-DaeHan/all-note-golang/database"
 	"github.com/Kim-DaeHan/all-note-golang/handlers"
 	"github.com/Kim-DaeHan/all-note-golang/services"
+	"github.com/Kim-DaeHan/all-note-golang/services/impl"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,7 +43,7 @@ func SetDependency(db *mongo.Client) {
 			Options: options.Index().SetUnique(true),
 		},
 	)
-	userService = services.NewUserServiceImpl(userCollection)
+	userService = impl.NewUserServiceImpl(userCollection)
 	userHandler = handlers.NewUserController(userService)
 	userRoute = NewUserRoutes(userHandler)
 

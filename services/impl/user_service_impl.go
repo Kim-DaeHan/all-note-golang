@@ -1,4 +1,4 @@
-package services
+package impl
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/Kim-DaeHan/all-note-golang/dto"
 	"github.com/Kim-DaeHan/all-note-golang/errors"
 	"github.com/Kim-DaeHan/all-note-golang/models"
+	"github.com/Kim-DaeHan/all-note-golang/services"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +20,7 @@ type UserServiceImpl struct {
 	collection *mongo.Collection
 }
 
-func NewUserServiceImpl(collection *mongo.Collection) UserService {
+func NewUserServiceImpl(collection *mongo.Collection) services.UserService {
 	return &UserServiceImpl{collection}
 }
 
