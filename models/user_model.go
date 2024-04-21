@@ -11,6 +11,7 @@ type User struct {
 	GoogleID  string             `bson:"google_id" json:"google_id"`
 	Email     string             `bson:"email" json:"email"`
 	UserName  string             `bson:"user_name" json:"user_name"`
+	Position  string             `bson:"position,omitempty" json:"position,omitempty"`
 	Verified  *bool              `bson:"verified,omitempty" json:"verified,omitempty"`
 	Provider  string             `bson:"provider" json:"provider"`
 	Photo     string             `bson:"photo" json:"photo"`
