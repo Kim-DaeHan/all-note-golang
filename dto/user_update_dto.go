@@ -7,4 +7,5 @@ type UserUpdateDTO struct {
 	Verified *bool  `json:"verified,omitempty"`
 	Provider string `json:"provider"`
 	Photo    string `json:"photo"`
+	Team     string `json:"team,omitempty"`
 }

@@ -50,4 +50,10 @@ func SetDependency(db *mongo.Client) {
 	// auth
 	authHandler = handlers.NewAuthController(userService)
 	authRoute = NewAuthRoutes(authHandler)
+
+	// team
+	// teamCollection = database.GetCollection(db, "teams")
+
+	// department
+	// departmentCollection = database.GetCollection(db, "departments")
 }
