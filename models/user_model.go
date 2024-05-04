@@ -16,6 +16,7 @@ type User struct {
 	Provider  string             `bson:"provider" json:"provider"`
 	Photo     string             `bson:"photo" json:"photo"`
 	Team      primitive.ObjectID `bson:"team,omitempty" json:"team,omitempty"`
+	TeamInfo  []Team             `bson:"team_info,omitempty" json:"team_info,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }

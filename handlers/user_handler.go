@@ -21,15 +21,14 @@ func NewUserController(userService services.UserService) UserHandler {
 var validate = validator.New()
 
 // GetAllUser godoc
-// @Summary 요약 기재
-// @Description 상세한 설명 기재
-// @name get-string-by-int
+// @Summary 전체 유저 조회
+// @Description 전체 유저 조회
+// @name GetAllUser
 // @Accept  json
 // @Produce  json
-// @Param name path string true "User name"
-// @Router /api/users [get]
+// @Router /users [get]
 // @Success 200 {object} models.User
-// @Failure 400
+// @Failure 500
 func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 	users, err := uh.userService.GetAllUser()
 
@@ -49,6 +48,16 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": users})
 }
 
+// GetUser godoc
+// @Summary 유저 조회
+// @Description 유저 조회
+// @name GetUser
+// @Accept  json
+// @Produce  json
+// @Param userId path string true "유저 ID"
+// @Router /users/{userId} [get]
+// @Success 200 {object} models.User
+// @Failure 500
 func (uh *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -70,6 +79,16 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": users})
 }
 
+// CreateUser godoc
+// @Summary 유저 생성
+// @Description 유저 생성
+// @name CreateUser
+// @Accept  json
+// @Produce  json
+// @Param user body dto.UserCreateDTO true "유저 정보"
+// @Router /users [post]
+// @Success 200 {object} models.User
+// @Failure 500
 func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	var dto dto.UserCreateDTO
 
@@ -103,6 +122,16 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
 }
 
+// UpsertUser godoc
+// @Summary 유저 Upsert
+// @Description 유저 생성 or 업데이트
+// @name UpsertUser
+// @Accept  json
+// @Produce  json
+// @Param user body dto.UserUpdateDTO true "유저 정보"
+// @Router /users/upsert [post]
+// @Success 200 {object} models.User
+// @Failure 500
 func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
 	var dto dto.UserUpdateDTO
 
