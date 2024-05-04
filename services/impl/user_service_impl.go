@@ -30,8 +30,18 @@ func (us *UserServiceImpl) GetAllUser() ([]models.User, error) {
 
 	var users []models.User
 
-	query := bson.M{}
-	results, err := us.collection.Find(ctx, query)
+	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "teams"},
+		{Key: "localField", Value: "team"},
+		{Key: "foreignField", Value: "_id"},
+		{Key: "as", Value: "team_info"},
+	}}}
+
+	pipeline := mongo.Pipeline{lookupStage}
+
+	// query := bson.M{}
+	// results, err := us.collection.Find(ctx, query)
+	results, err := us.collection.Aggregate(ctx, pipeline)
 	// err := us.collection.FindOne(ctx, query).Decode(&users)
 
 	if err != nil {
@@ -71,15 +81,36 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 
 	var users *models.User
 
-	query := bson.M{"_id": objID}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: objID}}}}
 
-	err = us.collection.FindOne(ctx, query).Decode(&users)
+	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "teams"},
+		{Key: "localField", Value: "team"},
+		{Key: "foreignField", Value: "_id"},
+		{Key: "as", Value: "team_info"},
+	}}}
+
+	pipeline := mongo.Pipeline{matchStage, lookupStage}
+
+	result, err := us.collection.Aggregate(ctx, pipeline)
 
 	if err != nil {
 		return nil, &errors.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
+		}
+	}
+
+	defer result.Close(ctx)
+
+	if result.Next(ctx) {
+		if err := result.Decode(&users); err != nil {
+			return nil, &errors.CustomError{
+				Message:    "내부 서버 오류",
+				StatusCode: http.StatusInternalServerError,
+				Err:        err,
+			}
 		}
 	}
 
@@ -123,6 +154,8 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	var teamId primitive.ObjectID
+
 	user := bson.M{
 		"google_id":  dto.GoogleID,
 		"email":      dto.Email,
@@ -133,14 +166,29 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 		"updated_at": time.Now(),
 	}
 
+	if dto.Team != "" {
+		var err error
+		teamId, err = primitive.ObjectIDFromHex(dto.Team)
+
+		if err != nil {
+			return nil, &errors.CustomError{
+				Message:    "Team ObjectID 변환 오류",
+				StatusCode: http.StatusInternalServerError,
+				Err:        err,
+			}
+		}
+
+		user["team"] = teamId
+	}
+
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(1)
 	query := bson.D{{Key: "email", Value: dto.Email}}
 	update := bson.D{{Key: "$set", Value: user}, {Key: "$setOnInsert", Value: bson.M{"create_at": time.Now()}}}
-	res := us.collection.FindOneAndUpdate(ctx, query, update, opts)
+	result := us.collection.FindOneAndUpdate(ctx, query, update, opts)
 
 	var updatedUser *models.User
 
-	if err := res.Decode(&updatedUser); err != nil {
+	if err := result.Decode(&updatedUser); err != nil {
 		return nil, &errors.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
