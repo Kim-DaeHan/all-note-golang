@@ -27,7 +27,7 @@ var validate = validator.New()
 // @Accept  json
 // @Produce  json
 // @Router /users [get]
-// @Success 200 {object} models.User
+// @Success 200 {object} User
 // @Failure 500
 func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 	users, err := uh.userService.GetAllUser()
@@ -56,7 +56,7 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 // @Produce  json
 // @Param userId path string true "유저 ID"
 // @Router /users/{userId} [get]
-// @Success 200 {object} models.User
+// @Success 200 {object} User
 // @Failure 500
 func (uh *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -87,7 +87,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 // @Produce  json
 // @Param user body dto.UserCreateDTO true "유저 정보"
 // @Router /users [post]
-// @Success 200 {object} models.User
+// @Success 200 {object} User
 // @Failure 500
 func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	var dto dto.UserCreateDTO
@@ -130,7 +130,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 // @Produce  json
 // @Param user body dto.UserUpdateDTO true "유저 정보"
 // @Router /users/upsert [post]
-// @Success 200 {object} models.User
+// @Success 200 {object} User
 // @Failure 500
 func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
 	var dto dto.UserUpdateDTO
