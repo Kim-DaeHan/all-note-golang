@@ -1,5 +1,7 @@
 package dto
 
+// UserUpdateDTO info
+// @Description User information update dto
 type UserUpdateDTO struct {
 	GoogleID string `json:"google_id"`
 	Email    string `json:"email"`
@@ -8,4 +10,4 @@ type UserUpdateDTO struct {
 	Provider string `json:"provider"`
 	Photo    string `json:"photo"`
 	Team     string `json:"team,omitempty"`
-}
+} //@name UserUpdateDTO

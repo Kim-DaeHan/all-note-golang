@@ -6,6 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// User info
+// @Description User information
 type User struct {
 	ID        primitive.ObjectID `bson:"_id" json:"id"`
 	GoogleID  string             `bson:"google_id" json:"google_id"`
@@ -19,4 +21,4 @@ type User struct {
 	TeamInfo  []Team             `bson:"team_info,omitempty" json:"team_info,omitempty"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
-}
+} //@name User
