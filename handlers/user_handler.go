@@ -7,7 +7,6 @@ import (
 	"github.com/Kim-DaeHan/all-note-golang/errors"
 	"github.com/Kim-DaeHan/all-note-golang/services"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator"
 )
 
 type UserHandler struct {
@@ -17,8 +16,6 @@ type UserHandler struct {
 func NewUserController(userService services.UserService) UserHandler {
 	return UserHandler{userService}
 }
-
-var validate = validator.New()
 
 // GetAllUser godoc
 // @Summary 전체 유저 조회

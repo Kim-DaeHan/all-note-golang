@@ -23,6 +23,12 @@ var (
 	// auth
 	authHandler handlers.AuthHandler
 	authRoute   AuthRoutes
+
+	// note
+	noteCollection *mongo.Collection
+	noteService    services.NoteService
+	noteHandler    handlers.NoteHandler
+	noteRoute      NoteRoutes
 )
 
 func SetupRoutes(router *gin.Engine) {
@@ -30,6 +36,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	userRoute.SetUserRoutes(apiGroup)
 	authRoute.SetAuthRoutes(apiGroup, userCollection)
+	noteRoute.SetNoteRoutes(apiGroup)
 
 }
 
@@ -51,9 +58,12 @@ func SetDependency(db *mongo.Client) {
 	authHandler = handlers.NewAuthController(userService)
 	authRoute = NewAuthRoutes(authHandler)
 
-	// team
-	// teamCollection = database.GetCollection(db, "teams")
-
 	// department
 	// departmentCollection = database.GetCollection(db, "departments")
+
+	// note
+	noteCollection = database.GetCollection(db, "notes")
+	noteService = impl.NewNoteServiceImpl(noteCollection)
+	noteHandler = handlers.NewNoteController(noteService)
+	noteRoute = NewNoteRoutes(noteHandler)
 }
