@@ -18,6 +18,7 @@ func (nr *NoteRoutes) SetNoteRoutes(router *gin.RouterGroup) {
 
 	notes.GET("/", nr.noteHandler.GetAllNote)
 	notes.GET("/:id", nr.noteHandler.GetNote)
+	notes.GET("/:id/user", nr.noteHandler.GetNoteByUser)
 	notes.POST("/", nr.noteHandler.CreateNote)
 
 }
