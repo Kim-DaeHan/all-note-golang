@@ -108,7 +108,7 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 		fmt.Println("result: ", result)
 		if err := result.Decode(&users); err != nil {
 			return nil, &errors.CustomError{
-				Message:    "내부 서버 오류",
+				Message:    "결과 디코딩 오류",
 				StatusCode: http.StatusInternalServerError,
 				Err:        err,
 			}
@@ -118,7 +118,7 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 	return users, nil
 }
 
-func (us *UserServiceImpl) CreateUser(dto dto.UserCreateDTO) (*mongo.InsertOneResult, error) {
+func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -191,7 +191,7 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 
 	if err := result.Decode(&updatedUser); err != nil {
 		return nil, &errors.CustomError{
-			Message:    "내부 서버 오류",
+			Message:    "결과 디코딩 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
 		}
