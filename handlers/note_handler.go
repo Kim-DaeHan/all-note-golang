@@ -24,7 +24,7 @@ func NewNoteController(noteService services.NoteService) NoteHandler {
 // @Accept  json
 // @Produce  json
 // @Router /notes [get]
-// @Success 200 {object} Note
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 	notes, err := nh.noteService.GetAllNote()
@@ -53,7 +53,7 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 // @Produce  json
 // @Param noteId path string true "Note ID"
 // @Router /notes/{noteId} [get]
-// @Success 200 {object} Note
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -84,7 +84,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 // @Produce  json
 // @Param userId path string true "User ID"
 // @Router /notes/{userId}/user [get]
-// @Success 200 {object} Note
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
@@ -115,7 +115,7 @@ func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 // @Produce  json
 // @Param note body dto.NoteCreateDTO true "노트 정보"
 // @Router /notes [post]
-// @Success 200 {object} Note
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 	var dto dto.NoteCreateDTO
@@ -132,7 +132,52 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 		return
 	}
 
-	result, err := nh.noteService.CreateNote(dto)
+	result, err := nh.noteService.CreateNote(&dto)
+
+	if err != nil {
+		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
+		customErr, ok := err.(*errors.CustomError)
+		if ok {
+			statusCode := customErr.Status()
+			ctx.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
+			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
+}
+
+// UpdateNote godoc
+// @Summary 노트 수정
+// @Description 노트 수정
+// @name UpdateNote
+// @Accept  json
+// @Produce  json
+// @Param noteId path string true "Note ID"
+// @Param note body dto.NoteUpdateDTO true "노트 정보"
+// @Router /notes/{noteId} [post]
+// @Success 200 {object} dto.APIResponse
+// @Failure 500
+func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
+	var dto dto.NoteUpdateDTO
+	noteId := ctx.Param("id")
+
+	//validate the request body
+	if err := ctx.BindJSON(&dto); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	//use the validator library to validate required fields
+	if validationErr := validate.Struct(&dto); validationErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": validationErr.Error()})
+		return
+	}
+
+	result, err := nh.noteService.UpdateNote(noteId, &dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당

@@ -10,5 +10,6 @@ type NoteService interface {
 	GetAllNote() ([]models.Note, error)
 	GetNote(id string) (*models.Note, error)
 	GetNoteByUser(userId string) ([]models.Note, error)
-	CreateNote(dto dto.NoteCreateDTO) (*mongo.InsertOneResult, error)
+	CreateNote(dto *dto.NoteCreateDTO) (*mongo.InsertOneResult, error)
+	UpdateNote(id string, dto *dto.NoteUpdateDTO) (*models.Note, error)
 }

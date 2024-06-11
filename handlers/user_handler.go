@@ -24,7 +24,7 @@ func NewUserController(userService services.UserService) UserHandler {
 // @Accept  json
 // @Produce  json
 // @Router /users [get]
-// @Success 200 {object} User
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 	users, err := uh.userService.GetAllUser()
@@ -53,7 +53,7 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 // @Produce  json
 // @Param userId path string true "유저 ID"
 // @Router /users/{userId} [get]
-// @Success 200 {object} User
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (uh *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -84,7 +84,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 // @Produce  json
 // @Param user body dto.UserCreateDTO true "유저 정보"
 // @Router /users [post]
-// @Success 200 {object} User
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	var dto dto.UserCreateDTO
@@ -101,7 +101,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.CreateUser(dto)
+	result, err := uh.userService.CreateUser(&dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -127,7 +127,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 // @Produce  json
 // @Param user body dto.UserUpdateDTO true "유저 정보"
 // @Router /users/upsert [post]
-// @Success 200 {object} User
+// @Success 200 {object} dto.APIResponse
 // @Failure 500
 func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
 	var dto dto.UserUpdateDTO
