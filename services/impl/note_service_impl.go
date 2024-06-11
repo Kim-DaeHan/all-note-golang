@@ -259,3 +259,38 @@ func (ns *NoteServiceImpl) UpdateNote(id string, dto *dto.NoteUpdateDTO) (*model
 
 	return updatedNote, nil
 }
+
+func (ns *NoteServiceImpl) DeleteNote(id string) (*mongo.DeleteResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, &errors.CustomError{
+			Message:    "Note ObjectID 변환 오류",
+			StatusCode: http.StatusBadRequest,
+			Err:        err,
+		}
+	}
+
+	filter := bson.M{"_id": objID}
+
+	result, err := ns.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, &errors.CustomError{
+			Message:    "내부 서버 오류",
+			StatusCode: http.StatusInternalServerError,
+			Err:        err,
+		}
+	}
+
+	if result.DeletedCount == 0 {
+		return nil, &errors.CustomError{
+			Message:    "노트를 찾을 수 없음",
+			StatusCode: http.StatusNotFound,
+			Err:        mongo.ErrNoDocuments,
+		}
+	}
+
+	return result, nil
+}

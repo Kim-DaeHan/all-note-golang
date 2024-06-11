@@ -12,4 +12,5 @@ type NoteService interface {
 	GetNoteByUser(userId string) ([]models.Note, error)
 	CreateNote(dto *dto.NoteCreateDTO) (*mongo.InsertOneResult, error)
 	UpdateNote(id string, dto *dto.NoteUpdateDTO) (*models.Note, error)
+	DeleteNote(id string) (*mongo.DeleteResult, error)
 }

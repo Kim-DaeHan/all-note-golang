@@ -194,3 +194,34 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 
 	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
 }
+
+// DeleteNote godoc
+// @Summary 노트 삭제
+// @Description 노트 삭제
+// @name DeleteNote
+// @Accept  json
+// @Produce  json
+// @Param noteId path string true "Note ID"
+// @Router /notes/{noteId} [delete]
+// @Success 200 {object} dto.APIResponse
+// @Failure 500
+func (nh *NoteHandler) DeleteNote(ctx *gin.Context) {
+	noteId := ctx.Param("id")
+
+	notes, err := nh.noteService.DeleteNote(noteId)
+
+	if err != nil {
+		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
+		customErr, ok := err.(*errors.CustomError)
+		if ok {
+			statusCode := customErr.Status()
+			ctx.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
+			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
+	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
+}
