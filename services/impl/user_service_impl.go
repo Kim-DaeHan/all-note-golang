@@ -118,7 +118,7 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 	return users, nil
 }
 
-func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) (*mongo.InsertOneResult, error) {
+func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -138,17 +138,17 @@ func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) (*mongo.InsertOneR
 
 	fmt.Printf("user: %+v", user)
 
-	result, err := us.collection.InsertOne(ctx, user)
+	_, err := us.collection.InsertOne(ctx, user)
 
 	if err != nil {
-		return nil, &errors.CustomError{
+		return &errors.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
 		}
 	}
 
-	return result, nil
+	return nil
 }
 
 func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, error) {

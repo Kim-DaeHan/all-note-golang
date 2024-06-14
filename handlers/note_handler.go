@@ -24,7 +24,7 @@ func NewNoteController(noteService services.NoteService) NoteHandler {
 // @Accept  json
 // @Produce  json
 // @Router /notes [get]
-// @Success 200 {object} dto.APIResponse
+// @Success 200 {object} dto.APIResponse[[]Note]
 // @Failure 500
 func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 	notes, err := nh.noteService.GetAllNote()
@@ -42,7 +42,7 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
 }
 
 // GetNote godoc
@@ -53,7 +53,7 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 // @Produce  json
 // @Param noteId path string true "Note ID"
 // @Router /notes/{noteId} [get]
-// @Success 200 {object} dto.APIResponse
+// @Success 200 {object} dto.APIResponse[Note]
 // @Failure 500
 func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -73,7 +73,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": note})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": note})
 }
 
 // GetNoteByUser godoc
@@ -84,7 +84,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 // @Produce  json
 // @Param userId path string true "User ID"
 // @Router /notes/{userId}/user [get]
-// @Success 200 {object} dto.APIResponse
+// @Success 200 {object} dto.APIResponse[[]Note]
 // @Failure 500
 func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 	userId := ctx.Param("id")
@@ -104,7 +104,7 @@ func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
 }
 
 // CreateNote godoc
@@ -115,7 +115,7 @@ func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 // @Produce  json
 // @Param note body dto.NoteCreateDTO true "노트 정보"
 // @Router /notes [post]
-// @Success 200 {object} dto.APIResponse
+// @Success 200 {object} dto.APIResponseWithoutData
 // @Failure 500
 func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 	var dto dto.NoteCreateDTO
@@ -132,7 +132,7 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 		return
 	}
 
-	result, err := nh.noteService.CreateNote(&dto)
+	err := nh.noteService.CreateNote(&dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -147,7 +147,7 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully"})
 }
 
 // UpdateNote godoc
@@ -158,8 +158,8 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 // @Produce  json
 // @Param noteId path string true "Note ID"
 // @Param note body dto.NoteUpdateDTO true "노트 정보"
-// @Router /notes/{noteId} [post]
-// @Success 200 {object} dto.APIResponse
+// @Router /notes/{noteId} [patch]
+// @Success 200 {object} dto.APIResponse[Note]
 // @Failure 500
 func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 	var dto dto.NoteUpdateDTO
@@ -177,7 +177,7 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 		return
 	}
 
-	result, err := nh.noteService.UpdateNote(noteId, &dto)
+	note, err := nh.noteService.UpdateNote(noteId, &dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -192,7 +192,7 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": note})
 }
 
 // DeleteNote godoc
@@ -203,12 +203,12 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 // @Produce  json
 // @Param noteId path string true "Note ID"
 // @Router /notes/{noteId} [delete]
-// @Success 200 {object} dto.APIResponse
+// @Success 200 {object} dto.APIResponseWithoutData
 // @Failure 500
 func (nh *NoteHandler) DeleteNote(ctx *gin.Context) {
 	noteId := ctx.Param("id")
 
-	notes, err := nh.noteService.DeleteNote(noteId)
+	err := nh.noteService.DeleteNote(noteId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -223,5 +223,5 @@ func (nh *NoteHandler) DeleteNote(ctx *gin.Context) {
 		}
 	}
 
-	ctx.IndentedJSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": notes})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully"})
 }

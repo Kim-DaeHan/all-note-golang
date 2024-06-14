@@ -10,8 +10,8 @@ import (
 // @Description Note information
 type Note struct {
 	ID         primitive.ObjectID `bson:"_id" json:"id"`
-	Author     primitive.ObjectID `bson:"author,omitempty" json:"author,omitempty"`
-	AuthorInfo []User             `bson:"author_info,omitempty" json:"author_info,omitempty"`
+	Author     primitive.ObjectID `bson:"author" json:"author"`
+	AuthorInfo []User             `bson:"author_info" json:"author_info"`
 	Text       string             `bson:"text" json:"text"`
 	CreatedAt  time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt  time.Time          `bson:"updated_at" json:"updated_at"`

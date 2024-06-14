@@ -166,7 +166,7 @@ func (ns *NoteServiceImpl) GetNoteByUser(userId string) ([]models.Note, error) {
 	return notes, nil
 }
 
-func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) (*mongo.InsertOneResult, error) {
+func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -186,7 +186,7 @@ func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) (*mongo.InsertOneR
 		userId, err = primitive.ObjectIDFromHex(dto.Author)
 
 		if err != nil {
-			return nil, &errors.CustomError{
+			return &errors.CustomError{
 				Message:    "User ObjectID 변환 오류",
 				StatusCode: http.StatusInternalServerError,
 				Err:        err,
@@ -198,17 +198,17 @@ func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) (*mongo.InsertOneR
 
 	fmt.Printf("user: %+v", note)
 
-	result, err := ns.collection.InsertOne(ctx, note)
+	_, err := ns.collection.InsertOne(ctx, note)
 
 	if err != nil {
-		return nil, &errors.CustomError{
+		return &errors.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
 		}
 	}
 
-	return result, nil
+	return nil
 }
 
 func (ns *NoteServiceImpl) UpdateNote(id string, dto *dto.NoteUpdateDTO) (*models.Note, error) {
@@ -260,13 +260,13 @@ func (ns *NoteServiceImpl) UpdateNote(id string, dto *dto.NoteUpdateDTO) (*model
 	return updatedNote, nil
 }
 
-func (ns *NoteServiceImpl) DeleteNote(id string) (*mongo.DeleteResult, error) {
+func (ns *NoteServiceImpl) DeleteNote(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, &errors.CustomError{
+		return &errors.CustomError{
 			Message:    "Note ObjectID 변환 오류",
 			StatusCode: http.StatusBadRequest,
 			Err:        err,
@@ -277,7 +277,7 @@ func (ns *NoteServiceImpl) DeleteNote(id string) (*mongo.DeleteResult, error) {
 
 	result, err := ns.collection.DeleteOne(ctx, filter)
 	if err != nil {
-		return nil, &errors.CustomError{
+		return &errors.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
@@ -285,12 +285,12 @@ func (ns *NoteServiceImpl) DeleteNote(id string) (*mongo.DeleteResult, error) {
 	}
 
 	if result.DeletedCount == 0 {
-		return nil, &errors.CustomError{
+		return &errors.CustomError{
 			Message:    "노트를 찾을 수 없음",
 			StatusCode: http.StatusNotFound,
 			Err:        mongo.ErrNoDocuments,
 		}
 	}
 
-	return result, nil
+	return nil
 }
