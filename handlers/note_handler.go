@@ -20,7 +20,7 @@ func NewNoteController(noteService services.NoteService) NoteHandler {
 // GetAllNote godoc
 // @Summary 전체 노트 조회
 // @Description 전체 노트 조회
-// @name GetAllNote
+// @ID GetAllNote
 // @Accept  json
 // @Produce  json
 // @Router /notes [get]
@@ -48,7 +48,7 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 // GetNote godoc
 // @Summary 노트 조회
 // @Description 노트 조회
-// @name GetNote
+// @ID GetNote
 // @Accept  json
 // @Produce  json
 // @Param noteId path string true "Note ID"
@@ -79,7 +79,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 // GetNoteByUser godoc
 // @Summary 노트 조회(유저)
 // @Description 노트 조회(유저)
-// @name GetNoteByUser
+// @ID GetNoteByUser
 // @Accept  json
 // @Produce  json
 // @Param userId path string true "User ID"
@@ -110,7 +110,7 @@ func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 // CreateNote godoc
 // @Summary 노트 생성
 // @Description 노트 생성
-// @name CreateNote
+// @ID CreateNote
 // @Accept  json
 // @Produce  json
 // @Param note body dto.NoteCreateDTO true "노트 정보"
@@ -153,7 +153,7 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 // UpdateNote godoc
 // @Summary 노트 수정
 // @Description 노트 수정
-// @name UpdateNote
+// @ID UpdateNote
 // @Accept  json
 // @Produce  json
 // @Param noteId path string true "Note ID"
@@ -198,7 +198,7 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 // DeleteNote godoc
 // @Summary 노트 삭제
 // @Description 노트 삭제
-// @name DeleteNote
+// @ID DeleteNote
 // @Accept  json
 // @Produce  json
 // @Param noteId path string true "Note ID"

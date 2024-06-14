@@ -20,7 +20,7 @@ func NewUserController(userService services.UserService) UserHandler {
 // GetAllUser godoc
 // @Summary 전체 유저 조회
 // @Description 전체 유저 조회
-// @name GetAllUser
+// @ID GetAllUser
 // @Accept  json
 // @Produce  json
 // @Router /users [get]
@@ -48,7 +48,7 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 // GetUser godoc
 // @Summary 유저 조회
 // @Description 유저 조회
-// @name GetUser
+// @ID GetUser
 // @Accept  json
 // @Produce  json
 // @Param userId path string true "유저 ID"
@@ -79,7 +79,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 // CreateUser godoc
 // @Summary 유저 생성
 // @Description 유저 생성
-// @name CreateUser
+// @ID CreateUser
 // @Accept  json
 // @Produce  json
 // @Param user body dto.UserCreateDTO true "유저 정보"
@@ -122,7 +122,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 // UpsertUser godoc
 // @Summary 유저 Upsert
 // @Description 유저 생성 or 업데이트
-// @name UpsertUser
+// @ID UpsertUser
 // @Accept  json
 // @Produce  json
 // @Param user body dto.UserUpdateDTO true "유저 정보"
