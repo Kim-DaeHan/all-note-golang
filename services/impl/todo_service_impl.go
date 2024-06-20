@@ -10,6 +10,7 @@ import (
 	"github.com/Kim-DaeHan/all-note-golang/errors"
 	"github.com/Kim-DaeHan/all-note-golang/models"
 	"github.com/Kim-DaeHan/all-note-golang/services"
+	"github.com/Kim-DaeHan/all-note-golang/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -80,18 +81,14 @@ func (ts *TodoServiceImpl) GetTodo(id string) (*models.Todo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	todoId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "잘못된 ID 형식",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("Todo", err)
 	}
 
 	var todos *models.Todo
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: objID}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: todoId}}}}
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
@@ -141,22 +138,18 @@ func (ts *TodoServiceImpl) GetTodo(id string) (*models.Todo, error) {
 	return todos, nil
 }
 
-func (ts *TodoServiceImpl) GetTodoByUser(userId string) ([]models.Todo, error) {
+func (ts *TodoServiceImpl) GetTodoByUser(id string) ([]models.Todo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(userId)
+	userId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "잘못된 ID 형식",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("User", err)
 	}
 
 	var todos []models.Todo
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "user", Value: objID}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "user", Value: userId}}}}
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
@@ -208,35 +201,35 @@ func (ts *TodoServiceImpl) CreateTodo(dto *dto.TodoCreateDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var userId primitive.ObjectID
-
 	fmt.Printf("dto: %+v", dto)
 
-	note := models.Todo{
+	todo := models.Todo{
 		ID:        primitive.NewObjectID(),
 		Task:      dto.Task,
+		Status:    dto.Status,
+		StartDt:   dto.StartDt,
+		EndDt:     dto.EndDt,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	if dto.Author != "" {
-		var err error
-		userId, err = primitive.ObjectIDFromHex(dto.Author)
+	var err error
 
-		if err != nil {
-			return &errors.CustomError{
-				Message:    "User ObjectID 변환 오류",
-				StatusCode: http.StatusInternalServerError,
-				Err:        err,
-			}
-		}
-
-		note.Author = userId
+	if todo.Project, err = utils.ConvertToObjectId(dto.Project); err != nil {
+		return utils.ConvertError("Project", err)
 	}
 
-	fmt.Printf("user: %+v", note)
+	if todo.User, err = utils.ConvertToObjectId(dto.User); err != nil {
+		return utils.ConvertError("User", err)
+	}
 
-	_, err := ns.collection.InsertOne(ctx, note)
+	if todo.Department, err = utils.ConvertToObjectId(dto.Department); err != nil {
+		return utils.ConvertError("Department", err)
+	}
+
+	fmt.Printf("todo: %+v", todo)
+
+	_, err = ts.collection.InsertOne(ctx, todo)
 
 	if err != nil {
 		return &errors.CustomError{
@@ -253,28 +246,35 @@ func (ts *TodoServiceImpl) UpdateTodo(id string, dto *dto.TodoUpdateDTO) (*model
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	todoId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "Note ObjectID 변환 오류",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("Todo", err)
 	}
 
-	note := bson.M{
-		"text":       dto.Text,
+	todo := bson.M{
+		"task":       dto.Task,
+		"status":     dto.Status,
+		"start_dt":   dto.StartDt,
+		"end_dt":     dto.EndDt,
 		"updated_at": time.Now(),
 	}
 
-	filter := bson.M{"_id": objID}
-	update := bson.M{"$set": note}
+	if todo["department"], err = utils.ConvertToObjectId(dto.Department); err != nil {
+		return nil, utils.ConvertError("Department", err)
+	}
 
-	result := ns.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
+	if todo["project"], err = utils.ConvertToObjectId(dto.Project); err != nil {
+		return nil, utils.ConvertError("Project", err)
+	}
+
+	filter := bson.M{"_id": todoId}
+	update := bson.M{"$set": todo}
+
+	result := ts.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
 	if result.Err() != nil {
 		if result.Err() == mongo.ErrNoDocuments {
 			return nil, &errors.CustomError{
-				Message:    "노트를 찾을 수 없음",
+				Message:    "TODO를 찾을 수 없음",
 				StatusCode: http.StatusNotFound,
 				Err:        result.Err(),
 			}
@@ -286,8 +286,8 @@ func (ts *TodoServiceImpl) UpdateTodo(id string, dto *dto.TodoUpdateDTO) (*model
 		}
 	}
 
-	var updatedNote *models.Note
-	if err := result.Decode(&updatedNote); err != nil {
+	var updatedTodo *models.Todo
+	if err := result.Decode(&updatedTodo); err != nil {
 		return nil, &errors.CustomError{
 			Message:    "결과 디코딩 오류",
 			StatusCode: http.StatusInternalServerError,
@@ -295,25 +295,21 @@ func (ts *TodoServiceImpl) UpdateTodo(id string, dto *dto.TodoUpdateDTO) (*model
 		}
 	}
 
-	return updatedNote, nil
+	return updatedTodo, nil
 }
 
 func (ts *TodoServiceImpl) DeleteTodo(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	todoId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return &errors.CustomError{
-			Message:    "Note ObjectID 변환 오류",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return utils.ConvertError("Todo", err)
 	}
 
-	filter := bson.M{"_id": objID}
+	filter := bson.M{"_id": todoId}
 
-	result, err := ns.collection.DeleteOne(ctx, filter)
+	result, err := ts.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return &errors.CustomError{
 			Message:    "내부 서버 오류",
@@ -324,7 +320,7 @@ func (ts *TodoServiceImpl) DeleteTodo(id string) error {
 
 	if result.DeletedCount == 0 {
 		return &errors.CustomError{
-			Message:    "노트를 찾을 수 없음",
+			Message:    "TODO를 찾을 수 없음",
 			StatusCode: http.StatusNotFound,
 			Err:        mongo.ErrNoDocuments,
 		}

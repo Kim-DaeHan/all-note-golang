@@ -12,8 +12,8 @@ type Todo struct {
 	ID             primitive.ObjectID `bson:"_id" json:"id"`
 	Task           string             `bson:"task" json:"task"`
 	Status         string             `bson:"status" json:"status"`
-	Project        primitive.ObjectID `bson:"project" json:"project"`
-	ProjectrInfo   []Project          `bson:"project_info" json:"project_info"`
+	Project        primitive.ObjectID `bson:"project,omitempty" json:"project,omitempty"`
+	ProjectrInfo   []Project          `bson:"project_info,omitempty" json:"project_info,omitempty"`
 	StartDt        time.Time          `bson:"start_dt" json:"start_dt"`
 	EndDt          time.Time          `bson:"end_dt" json:"end_dt"`
 	User           primitive.ObjectID `bson:"user" json:"user"`

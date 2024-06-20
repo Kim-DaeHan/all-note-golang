@@ -196,7 +196,7 @@ func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) error {
 		note.Author = userId
 	}
 
-	fmt.Printf("user: %+v", note)
+	fmt.Printf("note: %+v", note)
 
 	_, err := ns.collection.InsertOne(ctx, note)
 
