@@ -12,7 +12,7 @@ type JobApplication struct {
 	ID             primitive.ObjectID `bson:"_id" json:"id"`
 	Name           string             `bson:"name" json:"name"`
 	User           primitive.ObjectID `bson:"manager" json:"manager"`
-	UserInfo       []User             `bson:"manager_info" json:"manager_info"`
+	UserInfo       []User             `bson:"manager_info,omitempty" json:"manager_info,omitempty"`
 	Department     primitive.ObjectID `bson:"department,omitempty" json:"department,omitempty"`
 	DepartmentInfo []Department       `bson:"department_info,omitempty" json:"department_info,omitempty"`
 	Position       string             `bson:"position" json:"position"`

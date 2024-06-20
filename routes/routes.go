@@ -5,30 +5,11 @@ import (
 
 	"github.com/Kim-DaeHan/all-note-golang/database"
 	"github.com/Kim-DaeHan/all-note-golang/handlers"
-	"github.com/Kim-DaeHan/all-note-golang/services"
 	"github.com/Kim-DaeHan/all-note-golang/services/impl"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-var (
-	// user
-	userCollection *mongo.Collection
-	userService    services.UserService
-	userHandler    handlers.UserHandler
-	userRoute      UserRoutes
-
-	// auth
-	authHandler handlers.AuthHandler
-	authRoute   AuthRoutes
-
-	// note
-	noteCollection *mongo.Collection
-	noteService    services.NoteService
-	noteHandler    handlers.NoteHandler
-	noteRoute      NoteRoutes
 )
 
 func SetupRoutes(router *gin.Engine) {
@@ -37,7 +18,7 @@ func SetupRoutes(router *gin.Engine) {
 	userRoute.SetUserRoutes(apiGroup)
 	authRoute.SetAuthRoutes(apiGroup, userCollection)
 	noteRoute.SetNoteRoutes(apiGroup)
-
+	todoRoute.SetTodoRoutes(apiGroup)
 }
 
 func SetDependency(db *mongo.Client) {
@@ -66,4 +47,10 @@ func SetDependency(db *mongo.Client) {
 	noteService = impl.NewNoteServiceImpl(noteCollection)
 	noteHandler = handlers.NewNoteController(noteService)
 	noteRoute = NewNoteRoutes(noteHandler)
+
+	// todo
+	todoCollection = database.GetCollection(db, "todos")
+	todoService = impl.NewTodoServiceImpl(todoCollection)
+	todoHandler = handlers.NewTodoController(todoService)
+	todoRoute = NewTodoRoutes(todoHandler)
 }

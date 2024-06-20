@@ -252,23 +252,41 @@ func (ts *TodoServiceImpl) UpdateTodo(id string, dto *dto.TodoUpdateDTO) (*model
 	}
 
 	todo := bson.M{
-		"task":       dto.Task,
-		"status":     dto.Status,
-		"start_dt":   dto.StartDt,
-		"end_dt":     dto.EndDt,
 		"updated_at": time.Now(),
 	}
 
-	if todo["department"], err = utils.ConvertToObjectId(dto.Department); err != nil {
-		return nil, utils.ConvertError("Department", err)
+	if dto.Task != "" {
+		todo["task"] = dto.Task
 	}
 
-	if todo["project"], err = utils.ConvertToObjectId(dto.Project); err != nil {
-		return nil, utils.ConvertError("Project", err)
+	if dto.Status != "" {
+		todo["status"] = dto.Status
+	}
+
+	if !dto.StartDt.IsZero() {
+		todo["start_dt"] = dto.StartDt
+	}
+
+	if !dto.EndDt.IsZero() {
+		todo["end_dt"] = dto.EndDt
+	}
+
+	if dto.Department != "" {
+		if todo["department"], err = utils.ConvertToObjectId(dto.Department); err != nil {
+			return nil, utils.ConvertError("Department", err)
+		}
+	}
+
+	if dto.Project != "" {
+		if todo["project"], err = utils.ConvertToObjectId(dto.Project); err != nil {
+			return nil, utils.ConvertError("Project", err)
+		}
 	}
 
 	filter := bson.M{"_id": todoId}
 	update := bson.M{"$set": todo}
+
+	fmt.Printf("todo: %+v", todo)
 
 	result := ts.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
 	if result.Err() != nil {

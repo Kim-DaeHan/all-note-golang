@@ -25,7 +25,7 @@ type GoogleUserResult struct {
 	Given_name     string
 	Family_name    string
 	Picture        string
-	Locale         string
+	// Locale         string
 }
 
 func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
@@ -121,7 +121,7 @@ func GetGoogleUser(access_token string, id_token string) (*GoogleUserResult, err
 		Given_name:     GoogleUserRes["given_name"].(string),
 		Family_name:    GoogleUserRes["family_name"].(string),
 		Picture:        GoogleUserRes["picture"].(string),
-		Locale:         GoogleUserRes["locale"].(string),
+		// Locale:         GoogleUserRes["locale"].(string),
 	}
 
 	return userBody, nil

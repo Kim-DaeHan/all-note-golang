@@ -17,7 +17,7 @@ type Todo struct {
 	StartDt        time.Time          `bson:"start_dt" json:"start_dt"`
 	EndDt          time.Time          `bson:"end_dt" json:"end_dt"`
 	User           primitive.ObjectID `bson:"user" json:"user"`
-	UserInfo       []User             `bson:"user_info" json:"user_info"`
+	UserInfo       []User             `bson:"user_info,omitempty" json:"user_info,omitempty"`
 	Department     primitive.ObjectID `bson:"department,omitempty" json:"department,omitempty"`
 	DepartmentInfo []Department       `bson:"department_info,omitempty" json:"department_info,omitempty"`
 	CreatedAt      time.Time          `bson:"created_at" json:"created_at"`
