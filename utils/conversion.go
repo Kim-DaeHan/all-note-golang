@@ -17,9 +17,9 @@ func ConvertToObjectId(hex string) (primitive.ObjectID, error) {
 }
 
 // CustomError creates a new CustomError for ObjectID conversion errors.
-func ConvertError(fieldName string, err error) *errors.CustomError {
+func ConvertError(modelName string, err error) *errors.CustomError {
 	return &errors.CustomError{
-		Message:    fmt.Sprintf("%s ObjectID 변환 오류", fieldName),
+		Message:    fmt.Sprintf("%s ObjectID 변환 오류", modelName),
 		StatusCode: http.StatusInternalServerError,
 		Err:        err,
 	}
