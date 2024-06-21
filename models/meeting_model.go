@@ -17,7 +17,7 @@ type Meeting struct {
 	EndDt        time.Time          `bson:"end_dt" json:"end_dt"`
 	Location     string             `bson:"location" json:"location"`
 	User         primitive.ObjectID `bson:"created_by" json:"created_by"`
-	UserInfo     []User             `bson:"created_by_info" json:"created_by_info"`
+	UserInfo     []User             `bson:"created_by_info,omitempty" json:"created_by_info,omitempty"`
 	CreatedAt    time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt    time.Time          `bson:"updated_at" json:"updated_at"`
 } //@name Meeting

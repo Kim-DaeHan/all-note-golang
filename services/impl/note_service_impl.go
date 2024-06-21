@@ -10,6 +10,7 @@ import (
 	"github.com/Kim-DaeHan/all-note-golang/errors"
 	"github.com/Kim-DaeHan/all-note-golang/models"
 	"github.com/Kim-DaeHan/all-note-golang/services"
+	"github.com/Kim-DaeHan/all-note-golang/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -70,18 +71,14 @@ func (ns *NoteServiceImpl) GetNote(id string) (*models.Note, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	noteId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "잘못된 ID 형식",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("Todo", err)
 	}
 
 	var notes *models.Note
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: objID}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: noteId}}}}
 
 	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
@@ -117,22 +114,18 @@ func (ns *NoteServiceImpl) GetNote(id string) (*models.Note, error) {
 	return notes, nil
 }
 
-func (ns *NoteServiceImpl) GetNoteByUser(userId string) ([]models.Note, error) {
+func (ns *NoteServiceImpl) GetNoteByUser(id string) ([]models.Note, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(userId)
+	userId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "잘못된 ID 형식",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("User", err)
 	}
 
 	var notes []models.Note
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "author", Value: objID}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "author", Value: userId}}}}
 
 	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
@@ -170,8 +163,6 @@ func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var userId primitive.ObjectID
-
 	fmt.Printf("dto: %+v", dto)
 
 	note := models.Note{
@@ -181,24 +172,15 @@ func (ns *NoteServiceImpl) CreateNote(dto *dto.NoteCreateDTO) error {
 		UpdatedAt: time.Now(),
 	}
 
-	if dto.Author != "" {
-		var err error
-		userId, err = primitive.ObjectIDFromHex(dto.Author)
+	var err error
 
-		if err != nil {
-			return &errors.CustomError{
-				Message:    "User ObjectID 변환 오류",
-				StatusCode: http.StatusInternalServerError,
-				Err:        err,
-			}
-		}
-
-		note.Author = userId
+	if note.Author, err = utils.ConvertToObjectId(dto.Author); err != nil {
+		return utils.ConvertError("Note", err)
 	}
 
-	fmt.Printf("user: %+v", note)
+	fmt.Printf("note: %+v", note)
 
-	_, err := ns.collection.InsertOne(ctx, note)
+	_, err = ns.collection.InsertOne(ctx, note)
 
 	if err != nil {
 		return &errors.CustomError{
@@ -215,13 +197,9 @@ func (ns *NoteServiceImpl) UpdateNote(id string, dto *dto.NoteUpdateDTO) (*model
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	noteId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "Note ObjectID 변환 오류",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("Note", err)
 	}
 
 	note := bson.M{
@@ -229,7 +207,7 @@ func (ns *NoteServiceImpl) UpdateNote(id string, dto *dto.NoteUpdateDTO) (*model
 		"updated_at": time.Now(),
 	}
 
-	filter := bson.M{"_id": objID}
+	filter := bson.M{"_id": noteId}
 	update := bson.M{"$set": note}
 
 	result := ns.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))

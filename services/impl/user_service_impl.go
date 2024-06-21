@@ -2,14 +2,16 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Kim-DaeHan/all-note-golang/dto"
-	"github.com/Kim-DaeHan/all-note-golang/errors"
+	anErr "github.com/Kim-DaeHan/all-note-golang/errors"
 	"github.com/Kim-DaeHan/all-note-golang/models"
 	"github.com/Kim-DaeHan/all-note-golang/services"
+	"github.com/Kim-DaeHan/all-note-golang/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -45,7 +47,7 @@ func (us *UserServiceImpl) GetAllUser() ([]models.User, error) {
 	// err := us.collection.FindOne(ctx, query).Decode(&users)
 
 	if err != nil {
-		return nil, &errors.CustomError{
+		return nil, &anErr.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
@@ -56,7 +58,7 @@ func (us *UserServiceImpl) GetAllUser() ([]models.User, error) {
 	defer results.Close(ctx)
 
 	if err = results.All(ctx, &users); err != nil {
-		return nil, &errors.CustomError{
+		return nil, &anErr.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
@@ -70,18 +72,14 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	objID, err := primitive.ObjectIDFromHex(id)
+	userId, err := utils.ConvertToObjectId(id)
 	if err != nil {
-		return nil, &errors.CustomError{
-			Message:    "잘못된 ID 형식",
-			StatusCode: http.StatusBadRequest,
-			Err:        err,
-		}
+		return nil, utils.ConvertError("User", err)
 	}
 
 	var users *models.User
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: objID}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: userId}}}}
 
 	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "departments"},
@@ -95,7 +93,7 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 	result, err := us.collection.Aggregate(ctx, pipeline)
 
 	if err != nil {
-		return nil, &errors.CustomError{
+		return nil, &anErr.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
@@ -107,7 +105,7 @@ func (us *UserServiceImpl) GetUser(id string) (*models.User, error) {
 	if result.Next(ctx) {
 		fmt.Println("result: ", result)
 		if err := result.Decode(&users); err != nil {
-			return nil, &errors.CustomError{
+			return nil, &anErr.CustomError{
 				Message:    "결과 디코딩 오류",
 				StatusCode: http.StatusInternalServerError,
 				Err:        err,
@@ -141,7 +139,7 @@ func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) error {
 	_, err := us.collection.InsertOne(ctx, user)
 
 	if err != nil {
-		return &errors.CustomError{
+		return &anErr.CustomError{
 			Message:    "내부 서버 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
@@ -155,31 +153,41 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var departmentId primitive.ObjectID
+	var err error
+
+	if dto.Email == "" {
+		return nil, errors.New("email cannot be empty")
+	}
 
 	user := bson.M{
-		"google_id":  dto.GoogleID,
 		"email":      dto.Email,
-		"user_name":  dto.UserName,
-		"verified":   dto.Verified,
-		"provider":   dto.Provider,
-		"photo":      dto.Photo,
 		"updated_at": time.Now(),
 	}
 
+	if dto.GoogleID != "" {
+		user["google_id"] = dto.GoogleID
+	}
+
+	if dto.UserName != "" {
+		user["user_name"] = dto.UserName
+	}
+
+	if dto.Verified != nil {
+		user["verified"] = dto.Verified
+	}
+
+	if dto.Provider != "" {
+		user["provider"] = dto.Provider
+	}
+
+	if dto.Photo != "" {
+		user["photo"] = dto.Photo
+	}
+
 	if dto.Department != "" {
-		var err error
-		departmentId, err = primitive.ObjectIDFromHex(dto.Department)
-
-		if err != nil {
-			return nil, &errors.CustomError{
-				Message:    "Department ObjectID 변환 오류",
-				StatusCode: http.StatusInternalServerError,
-				Err:        err,
-			}
+		if user["department"], err = utils.ConvertToObjectId(dto.Department); err != nil {
+			return nil, utils.ConvertError("Department", err)
 		}
-
-		user["department"] = departmentId
 	}
 
 	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(1)
@@ -189,13 +197,13 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 
 	var updatedUser *models.User
 
+	// if{} 안에서만 사용가능한 err 변수
 	if err := result.Decode(&updatedUser); err != nil {
-		return nil, &errors.CustomError{
+		return nil, &anErr.CustomError{
 			Message:    "결과 디코딩 오류",
 			StatusCode: http.StatusInternalServerError,
 			Err:        err,
 		}
 	}
-
 	return updatedUser, nil
 }
