@@ -13,8 +13,8 @@ type TodoHandler struct {
 	todoService services.TodoService
 }
 
-func NewTodoController(TodoService services.TodoService) TodoHandler {
-	return TodoHandler{TodoService}
+func NewTodoController(todoService services.TodoService) TodoHandler {
+	return TodoHandler{todoService}
 }
 
 // GetAllTodo godoc
