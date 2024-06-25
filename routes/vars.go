@@ -28,4 +28,10 @@ var (
 	todoService    services.TodoService
 	todoHandler    handlers.TodoHandler
 	todoRoute      TodoRoutes
+
+	// project
+	projectCollection *mongo.Collection
+	projectService    services.ProjectService
+	projectHandler    handlers.ProjectHandler
+	projectRoute      ProjectRoutes
 )

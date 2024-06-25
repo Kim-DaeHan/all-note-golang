@@ -18,6 +18,7 @@ func NewNoteController(noteService services.NoteService) NoteHandler {
 }
 
 // GetAllNote godoc
+// @Tags Note
 // @Summary 전체 노트 조회
 // @Description 전체 노트 조회
 // @ID GetAllNote
@@ -46,6 +47,7 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 }
 
 // GetNote godoc
+// @Tags Note
 // @Summary 노트 조회
 // @Description 노트 조회
 // @ID GetNote
@@ -77,6 +79,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 }
 
 // GetNoteByUser godoc
+// @Tags Note
 // @Summary 노트 조회(유저)
 // @Description 노트 조회(유저)
 // @ID GetNoteByUser
@@ -108,6 +111,7 @@ func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
 }
 
 // CreateNote godoc
+// @Tags Note
 // @Summary 노트 생성
 // @Description 노트 생성
 // @ID CreateNote
@@ -151,6 +155,7 @@ func (nh *NoteHandler) CreateNote(ctx *gin.Context) {
 }
 
 // UpdateNote godoc
+// @Tags Note
 // @Summary 노트 수정
 // @Description 노트 수정
 // @ID UpdateNote
@@ -196,6 +201,7 @@ func (nh *NoteHandler) UpdateNote(ctx *gin.Context) {
 }
 
 // DeleteNote godoc
+// @Tags Note
 // @Summary 노트 삭제
 // @Description 노트 삭제
 // @ID DeleteNote

@@ -19,6 +19,7 @@ func SetupRoutes(router *gin.Engine) {
 	authRoute.SetAuthRoutes(apiGroup, userCollection)
 	noteRoute.SetNoteRoutes(apiGroup)
 	todoRoute.SetTodoRoutes(apiGroup)
+	projectRoute.SetProjectRoutes(apiGroup)
 }
 
 func SetDependency(db *mongo.Client) {
@@ -53,4 +54,10 @@ func SetDependency(db *mongo.Client) {
 	todoService = impl.NewTodoServiceImpl(todoCollection)
 	todoHandler = handlers.NewTodoController(todoService)
 	todoRoute = NewTodoRoutes(todoHandler)
+
+	// project
+	projectCollection = database.GetCollection(db, "projects")
+	projectService = impl.NewProjectServiceImpl(projectCollection)
+	projectHandler = handlers.NewProjectController(projectService)
+	projectRoute = NewProjectRoutes(projectHandler)
 }

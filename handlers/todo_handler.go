@@ -13,11 +13,12 @@ type TodoHandler struct {
 	todoService services.TodoService
 }
 
-func NewTodoController(TodoService services.TodoService) TodoHandler {
-	return TodoHandler{TodoService}
+func NewTodoController(todoService services.TodoService) TodoHandler {
+	return TodoHandler{todoService}
 }
 
 // GetAllTodo godoc
+// @Tags Todo
 // @Summary 전체 Todo 조회
 // @Description 전체 Todo 조회
 // @ID GetAllTodo
@@ -46,6 +47,7 @@ func (th *TodoHandler) GetAllTodo(ctx *gin.Context) {
 }
 
 // GetTodo godoc
+// @Tags Todo
 // @Summary Todo 조회
 // @Description Todo 조회
 // @ID GetTodo
@@ -77,6 +79,7 @@ func (th *TodoHandler) GetTodo(ctx *gin.Context) {
 }
 
 // GetTodoByUser godoc
+// @Tags Todo
 // @Summary Todo 조회(유저)
 // @Description Todo 조회(유저)
 // @ID GetTodoByUser
@@ -108,6 +111,7 @@ func (th *TodoHandler) GetTodoByUser(ctx *gin.Context) {
 }
 
 // CreateTodo godoc
+// @Tags Todo
 // @Summary Todo 생성
 // @Description Todo 생성
 // @ID CreateTodo
@@ -151,6 +155,7 @@ func (th *TodoHandler) CreateTodo(ctx *gin.Context) {
 }
 
 // UpdateTodo godoc
+// @Tags Todo
 // @Summary Todo 수정
 // @Description Todo 수정
 // @ID UpdateTodo
@@ -196,6 +201,7 @@ func (th *TodoHandler) UpdateTodo(ctx *gin.Context) {
 }
 
 // DeleteTodo godoc
+// @Tags Todo
 // @Summary Todo 삭제
 // @Description Todo 삭제
 // @ID DeleteTodo
