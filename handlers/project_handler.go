@@ -18,6 +18,7 @@ func NewProjectController(projectService services.ProjectService) ProjectHandler
 }
 
 // GetAllProject godoc
+// @Tags Project
 // @Summary 전체 Project 조회
 // @Description 전체 Project 조회
 // @ID GetAllProject
@@ -46,6 +47,7 @@ func (ph *ProjectHandler) GetAllProject(ctx *gin.Context) {
 }
 
 // CreateProject godoc
+// @Tags Project
 // @Summary Project 생성
 // @Description Project 생성
 // @ID CreateProject
@@ -89,6 +91,7 @@ func (ph *ProjectHandler) CreateProject(ctx *gin.Context) {
 }
 
 // UpdateProject godoc
+// @Tags Project
 // @Summary Project 수정
 // @Description Project 수정
 // @ID UpdateProject
@@ -134,6 +137,7 @@ func (ph *ProjectHandler) UpdateProject(ctx *gin.Context) {
 }
 
 // DeleteProject godoc
+// @Tags Project
 // @Summary Project 삭제
 // @Description Project 삭제
 // @ID DeleteProject

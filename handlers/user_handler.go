@@ -18,6 +18,7 @@ func NewUserController(userService services.UserService) UserHandler {
 }
 
 // GetAllUser godoc
+// @Tags User
 // @Summary 전체 유저 조회
 // @Description 전체 유저 조회
 // @ID GetAllUser
@@ -46,6 +47,7 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 }
 
 // GetUser godoc
+// @Tags User
 // @Summary 유저 조회
 // @Description 유저 조회
 // @ID GetUser
@@ -77,6 +79,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 }
 
 // CreateUser godoc
+// @Tags User
 // @Summary 유저 생성
 // @Description 유저 생성
 // @ID CreateUser
@@ -120,6 +123,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 }
 
 // UpsertUser godoc
+// @Tags User
 // @Summary 유저 Upsert
 // @Description 유저 생성 or 업데이트
 // @ID UpsertUser
