@@ -98,7 +98,7 @@ func (ps *ProjectServiceImpl) UpdateProject(id string, dto *dto.ProjectUpdateDTO
 	}
 
 	if dto.Name != "" {
-		project["task"] = dto.Name
+		project["name"] = dto.Name
 	}
 
 	if !dto.StartDt.IsZero() {
