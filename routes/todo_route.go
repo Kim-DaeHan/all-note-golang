@@ -18,7 +18,7 @@ func (tr *TodoRoutes) SetTodoRoutes(router *gin.RouterGroup) {
 
 	todos.GET("/", tr.todoHandler.GetAllTodo)
 	todos.GET("/:id", tr.todoHandler.GetTodo)
-	todos.GET("/:id/user", tr.todoHandler.GetTodoByUser)
+	todos.GET("/user/:id", tr.todoHandler.GetTodoByUser)
 	todos.POST("/", tr.todoHandler.CreateTodo)
 	todos.PATCH("/:id", tr.todoHandler.UpdateTodo)
 	todos.DELETE("/:id", tr.todoHandler.DeleteTodo)

@@ -13,7 +13,7 @@ type UserHandler struct {
 	userService services.UserService
 }
 
-func NewUserController(userService services.UserService) UserHandler {
+func NewUserHandler(userService services.UserService) UserHandler {
 	return UserHandler{userService}
 }
 
@@ -58,9 +58,9 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 // @Success 200 {object} dto.APIResponse[User]
 // @Failure 500
 func (uh *UserHandler) GetUser(ctx *gin.Context) {
-	id := ctx.Param("id")
+	userId := ctx.Param("id")
 
-	users, err := uh.userService.GetUser(id)
+	users, err := uh.userService.GetUser(userId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당

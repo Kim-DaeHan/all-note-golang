@@ -34,4 +34,10 @@ var (
 	projectService    services.ProjectService
 	projectHandler    handlers.ProjectHandler
 	projectRoute      ProjectRoutes
+
+	// project-task
+	projectTaskCollection *mongo.Collection
+	projectTaskService    services.ProjectTaskService
+	projectTaskHandler    handlers.ProjectTaskHandler
+	projectTaskRoute      ProjectTaskRoutes
 )

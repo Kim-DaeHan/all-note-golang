@@ -97,7 +97,7 @@ func (pts *ProjectTaskServiceImpl) GetProjectTaskByProject(id string) ([]models.
 
 	var tasks []models.ProjectTask
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "user", Value: projectId}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "project", Value: projectId}}}}
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
