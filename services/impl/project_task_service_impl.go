@@ -276,7 +276,7 @@ func (pts *ProjectTaskServiceImpl) DeleteProjectTask(id string) error {
 
 	if result.DeletedCount == 0 {
 		return &errors.CustomError{
-			Message:    "TODO를 찾을 수 없음",
+			Message:    "Project Task를 찾을 수 없음",
 			StatusCode: http.StatusNotFound,
 			Err:        mongo.ErrNoDocuments,
 		}
