@@ -184,6 +184,10 @@ func (us *UserServiceImpl) UpsertUser(dto *dto.UserUpdateDTO) (*models.User, err
 		user["photo"] = dto.Photo
 	}
 
+	if dto.Position != "" {
+		user["position"] = dto.Position
+	}
+
 	if dto.Department != "" {
 		if user["department"], err = utils.ConvertToObjectId(dto.Department); err != nil {
 			return nil, utils.ConvertError("Department", err)

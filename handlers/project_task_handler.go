@@ -9,26 +9,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TodoHandler struct {
-	todoService services.TodoService
+type ProjectTaskHandler struct {
+	projectTaskService services.ProjectTaskService
 }
 
-func NewTodoHandler(todoService services.TodoService) TodoHandler {
-	return TodoHandler{todoService}
+func NewProjectTaskHandler(projectTaskService services.ProjectTaskService) ProjectTaskHandler {
+	return ProjectTaskHandler{projectTaskService}
 }
 
-// GetAllTodo godoc
-// @Tags Todo
-// @Summary 전체 Todo 조회
-// @Description 전체 Todo 조회
-// @ID GetAllTodo
+// GetProjectTask godoc
+// @Tags ProjectTask
+// @Summary ProjectTask 조회
+// @Description ProjectTask 조회
+// @ID GetProjectTask
 // @Accept  json
 // @Produce  json
-// @Router /todos [get]
-// @Success 200 {object} dto.APIResponse[[]Todo]
+// @Param taskId path string true "Project Task ID"
+// @Router /project-tasks/{taskId} [get]
+// @Success 200 {object} dto.APIResponse[ProjectTask]
 // @Failure 500
-func (th *TodoHandler) GetAllTodo(ctx *gin.Context) {
-	todos, err := th.todoService.GetAllTodo()
+func (pth *ProjectTaskHandler) GetProjectTask(ctx *gin.Context) {
+	taskId := ctx.Param("id")
+
+	task, err := pth.projectTaskService.GetProjectTask(taskId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -43,24 +46,24 @@ func (th *TodoHandler) GetAllTodo(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": todos})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": task})
 }
 
-// GetTodo godoc
-// @Tags Todo
-// @Summary Todo 조회
-// @Description Todo 조회
-// @ID GetTodo
+// GetProjectTaskByProject godoc
+// @Tags ProjectTask
+// @Summary ProjectTask 조회(프로젝트)
+// @Description ProjectTask 조회(프로젝트)
+// @ID GetProjectTaskByProject
 // @Accept  json
 // @Produce  json
-// @Param todoId path string true "Todo ID"
-// @Router /todos/{todoId} [get]
-// @Success 200 {object} dto.APIResponse[Todo]
+// @Param projectId path string true "Project ID"
+// @Router /project-tasks/project/{projectId} [get]
+// @Success 200 {object} dto.APIResponse[[]ProjectTask]
 // @Failure 500
-func (th *TodoHandler) GetTodo(ctx *gin.Context) {
-	todoId := ctx.Param("id")
+func (pth *ProjectTaskHandler) GetProjectTaskByProject(ctx *gin.Context) {
+	projectId := ctx.Param("id")
 
-	todo, err := th.todoService.GetTodo(todoId)
+	tasks, err := pth.projectTaskService.GetProjectTaskByProject(projectId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -75,54 +78,22 @@ func (th *TodoHandler) GetTodo(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": todo})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": tasks})
 }
 
-// GetTodoByUser godoc
-// @Tags Todo
-// @Summary Todo 조회(유저)
-// @Description Todo 조회(유저)
-// @ID GetTodoByUser
+// CreateProjectTask godoc
+// @Tags ProjectTask
+// @Summary ProjectTask 생성
+// @Description ProjectTask 생성
+// @ID CreateProjectTask
 // @Accept  json
 // @Produce  json
-// @Param userId path string true "User ID"
-// @Router /todos/user/{userId} [get]
-// @Success 200 {object} dto.APIResponse[[]Todo]
-// @Failure 500
-func (th *TodoHandler) GetTodoByUser(ctx *gin.Context) {
-	userId := ctx.Param("id")
-
-	todos, err := th.todoService.GetTodoByUser(userId)
-
-	if err != nil {
-		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
-		customErr, ok := err.(*errors.CustomError)
-		if ok {
-			statusCode := customErr.Status()
-			ctx.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": todos})
-}
-
-// CreateTodo godoc
-// @Tags Todo
-// @Summary Todo 생성
-// @Description Todo 생성
-// @ID CreateTodo
-// @Accept  json
-// @Produce  json
-// @Param todo body dto.TodoCreateDTO true "Todo 정보"
-// @Router /todos [post]
+// @Param projectTask body dto.ProjectTaskCreateDTO true "ProjectTask 정보"
+// @Router /project-tasks [post]
 // @Success 200 {object} dto.APIResponseWithoutData
 // @Failure 500
-func (th *TodoHandler) CreateTodo(ctx *gin.Context) {
-	var dto dto.TodoCreateDTO
+func (pth *ProjectTaskHandler) CreateProjectTask(ctx *gin.Context) {
+	var dto dto.ProjectTaskCreateDTO
 
 	//validate the request body
 	if err := ctx.BindJSON(&dto); err != nil {
@@ -136,7 +107,7 @@ func (th *TodoHandler) CreateTodo(ctx *gin.Context) {
 		return
 	}
 
-	err := th.todoService.CreateTodo(&dto)
+	err := pth.projectTaskService.CreateProjectTask(&dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -154,21 +125,21 @@ func (th *TodoHandler) CreateTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully"})
 }
 
-// UpdateTodo godoc
-// @Tags Todo
-// @Summary Todo 수정
-// @Description Todo 수정
-// @ID UpdateTodo
+// UpdateProjectTask godoc
+// @Tags ProjectTask
+// @Summary ProjectTask 수정
+// @Description ProjectTask 수정
+// @ID UpdateProjectTask
 // @Accept  json
 // @Produce  json
-// @Param todoId path string true "Todo ID"
-// @Param todo body dto.TodoUpdateDTO true "Todo 정보"
-// @Router /todos/{todoId} [patch]
-// @Success 200 {object} dto.APIResponse[Todo]
+// @Param taskId path string true "Project Task ID"
+// @Param projectTask body dto.ProjectTaskUpdateDTO true "ProjectTask 정보"
+// @Router /project-tasks/{taskId} [patch]
+// @Success 200 {object} dto.APIResponse[ProjectTask]
 // @Failure 500
-func (th *TodoHandler) UpdateTodo(ctx *gin.Context) {
-	var dto dto.TodoUpdateDTO
-	todoId := ctx.Param("id")
+func (pth *ProjectTaskHandler) UpdateProjectTask(ctx *gin.Context) {
+	var dto dto.ProjectTaskUpdateDTO
+	taskId := ctx.Param("id")
 
 	//validate the request body
 	if err := ctx.BindJSON(&dto); err != nil {
@@ -182,7 +153,7 @@ func (th *TodoHandler) UpdateTodo(ctx *gin.Context) {
 		return
 	}
 
-	todo, err := th.todoService.UpdateTodo(todoId, &dto)
+	task, err := pth.projectTaskService.UpdateProjectTask(taskId, &dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -197,24 +168,24 @@ func (th *TodoHandler) UpdateTodo(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": todo})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": task})
 }
 
-// DeleteTodo godoc
-// @Tags Todo
-// @Summary Todo 삭제
-// @Description Todo 삭제
-// @ID DeleteTodo
+// DeleteProjectTask godoc
+// @Tags ProjectTask
+// @Summary ProjectTask 삭제
+// @Description ProjectTask 삭제
+// @ID DeleteProjectTask
 // @Accept  json
 // @Produce  json
-// @Param todoId path string true "Todo ID"
-// @Router /todos/{todoId} [delete]
+// @Param taskId path string true "ProjectTask ID"
+// @Router /project-tasks/{taskId} [delete]
 // @Success 200 {object} dto.APIResponseWithoutData
 // @Failure 500
-func (th *TodoHandler) DeleteTodo(ctx *gin.Context) {
-	todoId := ctx.Param("id")
+func (pth *ProjectTaskHandler) DeleteProjectTask(ctx *gin.Context) {
+	taskId := ctx.Param("id")
 
-	err := th.todoService.DeleteTodo(todoId)
+	err := pth.projectTaskService.DeleteProjectTask(taskId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당

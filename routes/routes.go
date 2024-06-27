@@ -20,6 +20,7 @@ func SetupRoutes(router *gin.Engine) {
 	noteRoute.SetNoteRoutes(apiGroup)
 	todoRoute.SetTodoRoutes(apiGroup)
 	projectRoute.SetProjectRoutes(apiGroup)
+	projectTaskRoute.SetProjectTaskRoutes(apiGroup)
 }
 
 func SetDependency(db *mongo.Client) {
@@ -33,11 +34,11 @@ func SetDependency(db *mongo.Client) {
 		},
 	)
 	userService = impl.NewUserServiceImpl(userCollection)
-	userHandler = handlers.NewUserController(userService)
+	userHandler = handlers.NewUserHandler(userService)
 	userRoute = NewUserRoutes(userHandler)
 
 	// auth
-	authHandler = handlers.NewAuthController(userService)
+	authHandler = handlers.NewAuthHandler(userService)
 	authRoute = NewAuthRoutes(authHandler)
 
 	// department
@@ -46,18 +47,24 @@ func SetDependency(db *mongo.Client) {
 	// note
 	noteCollection = database.GetCollection(db, "notes")
 	noteService = impl.NewNoteServiceImpl(noteCollection)
-	noteHandler = handlers.NewNoteController(noteService)
+	noteHandler = handlers.NewNoteHandler(noteService)
 	noteRoute = NewNoteRoutes(noteHandler)
 
 	// todo
 	todoCollection = database.GetCollection(db, "todos")
 	todoService = impl.NewTodoServiceImpl(todoCollection)
-	todoHandler = handlers.NewTodoController(todoService)
+	todoHandler = handlers.NewTodoHandler(todoService)
 	todoRoute = NewTodoRoutes(todoHandler)
 
 	// project
 	projectCollection = database.GetCollection(db, "projects")
 	projectService = impl.NewProjectServiceImpl(projectCollection)
-	projectHandler = handlers.NewProjectController(projectService)
+	projectHandler = handlers.NewProjectHandler(projectService)
 	projectRoute = NewProjectRoutes(projectHandler)
+
+	// project-tasks
+	projectTaskCollection = database.GetCollection(db, "project_tasks")
+	projectTaskService = impl.NewProjectTaskServiceImpl(projectTaskCollection)
+	projectTaskHandler = handlers.NewProjectTaskHandler(projectTaskService)
+	projectTaskRoute = NewProjectTaskRoutes(projectTaskHandler)
 }

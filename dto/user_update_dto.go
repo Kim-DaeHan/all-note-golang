@@ -6,6 +6,7 @@ type UserUpdateDTO struct {
 	GoogleID   string `json:"google_id"`
 	Email      string `json:"email"`
 	UserName   string `json:"user_name"`
+	Position   string `json:"position,omitempty"`
 	Verified   *bool  `json:"verified,omitempty"`
 	Provider   string `json:"provider"`
 	Photo      string `json:"photo"`

@@ -13,7 +13,7 @@ type ProjectHandler struct {
 	projectService services.ProjectService
 }
 
-func NewProjectController(projectService services.ProjectService) ProjectHandler {
+func NewProjectHandler(projectService services.ProjectService) ProjectHandler {
 	return ProjectHandler{projectService}
 }
 

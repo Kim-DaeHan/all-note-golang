@@ -13,7 +13,7 @@ type NoteHandler struct {
 	noteService services.NoteService
 }
 
-func NewNoteController(noteService services.NoteService) NoteHandler {
+func NewNoteHandler(noteService services.NoteService) NoteHandler {
 	return NoteHandler{noteService}
 }
 
@@ -58,9 +58,9 @@ func (nh *NoteHandler) GetAllNote(ctx *gin.Context) {
 // @Success 200 {object} dto.APIResponse[Note]
 // @Failure 500
 func (nh *NoteHandler) GetNote(ctx *gin.Context) {
-	id := ctx.Param("id")
+	noteId := ctx.Param("id")
 
-	note, err := nh.noteService.GetNote(id)
+	note, err := nh.noteService.GetNote(noteId)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -86,7 +86,7 @@ func (nh *NoteHandler) GetNote(ctx *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param userId path string true "User ID"
-// @Router /notes/{userId}/user [get]
+// @Router /notes/user/{userId} [get]
 // @Success 200 {object} dto.APIResponse[[]Note]
 // @Failure 500
 func (nh *NoteHandler) GetNoteByUser(ctx *gin.Context) {
