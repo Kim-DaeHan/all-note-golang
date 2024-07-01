@@ -11,11 +11,11 @@ import (
 type Meeting struct {
 	ID           primitive.ObjectID `bson:"_id" json:"id"`
 	Title        string             `bson:"title" json:"title"`
-	Description  string             `bson:"description" json:"description"`
-	Participants []Participant      `bson:"participants" json:"participants"`
+	Description  string             `bson:"description,omitempty" json:"description,omitempty"`
+	Participants []Participant      `bson:"participants,omitempty" json:"participants,omitempty"`
 	StartDt      time.Time          `bson:"start_dt" json:"start_dt"`
-	EndDt        time.Time          `bson:"end_dt" json:"end_dt"`
-	Location     string             `bson:"location" json:"location"`
+	EndDt        time.Time          `bson:"end_dt,omitempty" json:"end_dt,omitempty"`
+	Location     string             `bson:"location,omitempty" json:"location,omitempty"`
 	User         primitive.ObjectID `bson:"created_by" json:"created_by"`
 	UserInfo     []User             `bson:"created_by_info,omitempty" json:"created_by_info,omitempty"`
 	CreatedAt    time.Time          `bson:"created_at" json:"created_at"`

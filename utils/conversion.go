@@ -16,6 +16,19 @@ func ConvertToObjectId(hex string) (primitive.ObjectID, error) {
 	return primitive.ObjectIDFromHex(hex)
 }
 
+// ConvertStringIDsToObjectIDs converts a hex string[] to a primitive.ObjectID.
+func ConvertStringIDsToObjectIDs(ids []string) ([]primitive.ObjectID, error) {
+	var objIDs []primitive.ObjectID
+	for _, id := range ids {
+		objID, err := ConvertToObjectId(id)
+		if err != nil {
+			return nil, err
+		}
+		objIDs = append(objIDs, objID)
+	}
+	return objIDs, nil
+}
+
 // CustomError creates a new CustomError for ObjectID conversion errors.
 func ConvertError(modelName string, err error) *errors.CustomError {
 	return &errors.CustomError{
