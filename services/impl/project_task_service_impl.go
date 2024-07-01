@@ -34,7 +34,7 @@ func (pts *ProjectTaskServiceImpl) GetProjectTask(id string) (*models.ProjectTas
 		return nil, utils.ConvertError("ProjectTask", err)
 	}
 
-	var tasks *models.ProjectTask
+	var task *models.ProjectTask
 
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: taskId}}}}
 
@@ -74,7 +74,7 @@ func (pts *ProjectTaskServiceImpl) GetProjectTask(id string) (*models.ProjectTas
 	defer result.Close(ctx)
 
 	if result.Next(ctx) {
-		if err := result.Decode(&tasks); err != nil {
+		if err := result.Decode(&task); err != nil {
 			return nil, &errors.CustomError{
 				Message:    "결과 디코딩 오류",
 				StatusCode: http.StatusInternalServerError,
@@ -83,7 +83,7 @@ func (pts *ProjectTaskServiceImpl) GetProjectTask(id string) (*models.ProjectTas
 		}
 	}
 
-	return tasks, nil
+	return task, nil
 }
 
 func (pts *ProjectTaskServiceImpl) GetProjectTaskByProject(id string) ([]models.ProjectTask, error) {

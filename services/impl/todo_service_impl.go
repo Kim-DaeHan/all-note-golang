@@ -86,7 +86,7 @@ func (ts *TodoServiceImpl) GetTodo(id string) (*models.Todo, error) {
 		return nil, utils.ConvertError("Todo", err)
 	}
 
-	var todos *models.Todo
+	var todo *models.Todo
 
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: todoId}}}}
 
@@ -126,7 +126,7 @@ func (ts *TodoServiceImpl) GetTodo(id string) (*models.Todo, error) {
 	defer result.Close(ctx)
 
 	if result.Next(ctx) {
-		if err := result.Decode(&todos); err != nil {
+		if err := result.Decode(&todo); err != nil {
 			return nil, &errors.CustomError{
 				Message:    "결과 디코딩 오류",
 				StatusCode: http.StatusInternalServerError,
@@ -135,7 +135,7 @@ func (ts *TodoServiceImpl) GetTodo(id string) (*models.Todo, error) {
 		}
 	}
 
-	return todos, nil
+	return todo, nil
 }
 
 func (ts *TodoServiceImpl) GetTodoByUser(id string) ([]models.Todo, error) {

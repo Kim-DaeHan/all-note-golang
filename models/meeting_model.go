@@ -12,7 +12,7 @@ type Meeting struct {
 	ID           primitive.ObjectID `bson:"_id" json:"id"`
 	Title        string             `bson:"title" json:"title"`
 	Description  string             `bson:"description" json:"description"`
-	Participants string             `bson:"participants" json:"participants"`
+	Participants []Participant      `bson:"participants" json:"participants"`
 	StartDt      time.Time          `bson:"start_dt" json:"start_dt"`
 	EndDt        time.Time          `bson:"end_dt" json:"end_dt"`
 	Location     string             `bson:"location" json:"location"`
@@ -21,3 +21,8 @@ type Meeting struct {
 	CreatedAt    time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt    time.Time          `bson:"updated_at" json:"updated_at"`
 } //@name Meeting
+
+type Participant struct {
+	User     primitive.ObjectID `bson:"participant" json:"participant"`
+	UserInfo []User             `bson:"participant_info,omitempty" json:"participant_info,omitempty"`
+}

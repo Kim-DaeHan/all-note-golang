@@ -76,7 +76,7 @@ func (ns *NoteServiceImpl) GetNote(id string) (*models.Note, error) {
 		return nil, utils.ConvertError("Todo", err)
 	}
 
-	var notes *models.Note
+	var note *models.Note
 
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: noteId}}}}
 
@@ -102,7 +102,7 @@ func (ns *NoteServiceImpl) GetNote(id string) (*models.Note, error) {
 	defer result.Close(ctx)
 
 	if result.Next(ctx) {
-		if err := result.Decode(&notes); err != nil {
+		if err := result.Decode(&note); err != nil {
 			return nil, &errors.CustomError{
 				Message:    "결과 디코딩 오류",
 				StatusCode: http.StatusInternalServerError,
@@ -111,7 +111,7 @@ func (ns *NoteServiceImpl) GetNote(id string) (*models.Note, error) {
 		}
 	}
 
-	return notes, nil
+	return note, nil
 }
 
 func (ns *NoteServiceImpl) GetNoteByUser(id string) ([]models.Note, error) {

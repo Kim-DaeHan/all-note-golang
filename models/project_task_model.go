@@ -22,9 +22,11 @@ type ProjectTask struct {
 	UpdatedAt       time.Time          `bson:"updated_at" json:"updated_at"`
 } //@name ProjectTask
 
+// manager info
+// @Description manager information
 type manager struct {
 	Email    string `bson:"email" json:"email"`
 	UserName string `bson:"user_name" json:"user_name"`
 	Position string `json:"position,omitempty"`
 	Photo    string `json:"photo"`
-}
+} //@name manager
