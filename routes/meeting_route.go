@@ -16,9 +16,10 @@ func NewMeetingRoutes(meetingHandler handlers.MeetingHandler) MeetingRoutes {
 func (mr *MeetingRoutes) SetMeetingRoutes(router *gin.RouterGroup) {
 	meetings := router.Group("/meetings")
 
-	// todos.GET("/", tr.todoHandler.GetAllTodo)
+	meetings.GET("/", mr.meetingHandler.GetAllMeeting)
 	meetings.GET("/:id", mr.meetingHandler.GetMeeting)
+	meetings.GET("/created-by/:id", mr.meetingHandler.GetMeetingByUser)
 	meetings.POST("/", mr.meetingHandler.CreateMeeting)
-	// todos.PATCH("/:id", tr.todoHandler.UpdateTodo)
-	// todos.DELETE("/:id", tr.todoHandler.DeleteTodo)
+	meetings.PATCH("/:id", mr.meetingHandler.UpdateMeeting)
+	meetings.DELETE("/:id", mr.meetingHandler.DeleteMeeting)
 }

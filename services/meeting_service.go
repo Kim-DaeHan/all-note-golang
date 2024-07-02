@@ -6,10 +6,10 @@ import (
 )
 
 type MeetingService interface {
-	// GetAllTodo() ([]models.Todo, error)
+	GetAllMeeting() ([]models.Meeting, error)
 	GetMeeting(id string) (*models.Meeting, error)
-	// GetTodoByUser(userId string) ([]models.Todo, error)
+	GetMeetingByUser(userId string) ([]models.Meeting, error)
 	CreateMeeting(dto *dto.MeetingCreateDTO) error
-	// UpdateTodo(id string, dto *dto.TodoUpdateDTO) (*models.Todo, error)
-	// DeleteTodo(id string) error
+	UpdateMeeting(id string, dto *dto.MeetingUpdateDTO) (*models.Meeting, error)
+	DeleteMeeting(id string) error
 }
