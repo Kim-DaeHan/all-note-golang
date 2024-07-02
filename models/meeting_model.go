@@ -90,3 +90,25 @@ func (p Participant) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(aux)
 }
+
+// func (m *Meeting) MarshalJSON() ([]byte, error) {
+// 	type Alias Meeting
+// 	aux := &struct {
+// 		*Alias
+// 		EndDt *time.Time `json:"end_dt,omitempty"`
+// 		User  *string    `json:"created_by,omitempty"`
+// 	}{
+// 		Alias: (*Alias)(m),
+// 	}
+// 	if m.EndDt.IsZero() {
+// 		aux.EndDt = nil
+// 	} else {
+// 		aux.EndDt = &m.EndDt
+// 	}
+// 	if m.User.IsZero() {
+// 		aux.User = nil
+// 	} else {
+// 		aux.User = m.User.Hex()
+// 	}
+// 	return json.Marshal(aux)
+// }
