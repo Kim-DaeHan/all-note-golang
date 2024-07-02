@@ -40,4 +40,10 @@ var (
 	projectTaskService    services.ProjectTaskService
 	projectTaskHandler    handlers.ProjectTaskHandler
 	projectTaskRoute      ProjectTaskRoutes
+
+	// meeting
+	meetingCollection *mongo.Collection
+	meetingService    services.MeetingService
+	meetingHandler    handlers.MeetingHandler
+	meetingRoute      MeetingRoutes
 )
