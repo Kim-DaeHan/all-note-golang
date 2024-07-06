@@ -33,7 +33,7 @@ func (js *JobApplicationServiceImpl) GetAllJobApplication() ([]models.JobApplica
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
-		{Key: "localField", Value: "user"},
+		{Key: "localField", Value: "manager"},
 		{Key: "foreignField", Value: "_id"},
 		{Key: "as", Value: "manager_info"},
 	}}}
@@ -85,7 +85,7 @@ func (js *JobApplicationServiceImpl) GetJobApplication(id string) (*models.JobAp
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
-		{Key: "localField", Value: "user"},
+		{Key: "localField", Value: "manager"},
 		{Key: "foreignField", Value: "_id"},
 		{Key: "as", Value: "manager_info"},
 	}}}
@@ -139,7 +139,7 @@ func (js *JobApplicationServiceImpl) GetJobApplicationByManager(id string) ([]mo
 
 	lookupUserStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "users"},
-		{Key: "localField", Value: "user"},
+		{Key: "localField", Value: "manager"},
 		{Key: "foreignField", Value: "_id"},
 		{Key: "as", Value: "manager_info"},
 	}}}
@@ -235,11 +235,11 @@ func (js *JobApplicationServiceImpl) UpdateJobApplication(id string, dto *dto.Jo
 	}
 
 	if dto.ApplicantName != "" {
-		jobApplication["applicant_name"] = dto.Task
+		jobApplication["applicant_name"] = dto.ApplicantName
 	}
 
 	if dto.Position != "" {
-		jobApplication["position"] = dto.Task
+		jobApplication["position"] = dto.Position
 	}
 
 	if dto.Task != "" {
@@ -247,11 +247,11 @@ func (js *JobApplicationServiceImpl) UpdateJobApplication(id string, dto *dto.Jo
 	}
 
 	if dto.Stage != "" {
-		jobApplication["stage"] = dto.Task
+		jobApplication["stage"] = dto.Stage
 	}
 
 	if dto.Location != "" {
-		jobApplication["location"] = dto.Task
+		jobApplication["location"] = dto.Location
 	}
 
 	if dto.Status != "" {
