@@ -46,4 +46,10 @@ var (
 	meetingService    services.MeetingService
 	meetingHandler    handlers.MeetingHandler
 	meetingRoute      MeetingRoutes
+
+	// job-application
+	jobApplicationCollection *mongo.Collection
+	jobApplicationService    services.JobApplicationService
+	jobApplicationHandler    handlers.JobApplicationHandler
+	jobApplicationRoute      JobApplicationRoutes
 )

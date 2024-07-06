@@ -22,6 +22,7 @@ func SetupRoutes(router *gin.Engine) {
 	projectRoute.SetProjectRoutes(apiGroup)
 	projectTaskRoute.SetProjectTaskRoutes(apiGroup)
 	meetingRoute.SetMeetingRoutes(apiGroup)
+	jobApplicationRoute.SetJobApplicationRoutes(apiGroup)
 }
 
 func SetDependency(db *mongo.Client) {
@@ -74,4 +75,10 @@ func SetDependency(db *mongo.Client) {
 	meetingService = impl.NewMeetingServiceImpl(meetingCollection)
 	meetingHandler = handlers.NewMeetingHandler(meetingService)
 	meetingRoute = NewMeetingRoutes(meetingHandler)
+
+	// job-application
+	jobApplicationCollection = database.GetCollection(db, "job_applications")
+	jobApplicationService = impl.NewJobApplicationServiceImpl(jobApplicationCollection)
+	jobApplicationHandler = handlers.NewJobApplicationHandler(jobApplicationService)
+	jobApplicationRoute = NewJobApplicationRoutes(jobApplicationHandler)
 }
