@@ -1,5 +1,7 @@
 package dto
 
+// UserCreateDTO info
+// @Description User information create dto
 type UserCreateDTO struct {
 	GoogleID string `json:"google_id"`
 	Email    string `json:"email"`
@@ -7,4 +9,4 @@ type UserCreateDTO struct {
 	Verified *bool  `json:"verified,omitempty"`
 	Provider string `json:"provider"`
 	Photo    string `json:"photo"`
-}
+} //@name UserCreateDTO

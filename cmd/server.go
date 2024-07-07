@@ -4,20 +4,18 @@ import (
 	"context"
 
 	"github.com/Kim-DaeHan/all-note-golang/database"
-	"github.com/Kim-DaeHan/all-note-golang/docs"
 	"github.com/Kim-DaeHan/all-note-golang/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/Kim-DaeHan/all-note-golang/docs"
 )
 
 func SetupServer() *gin.Engine {
 	router := gin.Default()
-
-	//코드로 SwaggerInfo 속성을 지정해지만 doc.json 정상적으로 조회된다.
-	docs.SwaggerInfo.Title = "Swagger Example API"
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

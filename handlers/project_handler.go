@@ -9,26 +9,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	userService services.UserService
+type ProjectHandler struct {
+	projectService services.ProjectService
 }
 
-func NewUserHandler(userService services.UserService) UserHandler {
-	return UserHandler{userService}
+func NewProjectHandler(projectService services.ProjectService) ProjectHandler {
+	return ProjectHandler{projectService}
 }
 
-// GetAllUser godoc
-// @Tags User
-// @Summary 전체 유저 조회
-// @Description 전체 유저 조회
-// @ID GetAllUser
+// GetAllProject godoc
+// @Tags Project
+// @Summary 전체 Project 조회
+// @Description 전체 Project 조회
+// @ID GetAllProject
 // @Accept  json
 // @Produce  json
-// @Router /users [get]
-// @Success 200 {object} dto.APIResponse[[]User]
+// @Router /projects [get]
+// @Success 200 {object} dto.APIResponse[[]Project]
 // @Failure 500
-func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
-	users, err := uh.userService.GetAllUser()
+func (ph *ProjectHandler) GetAllProject(ctx *gin.Context) {
+	projects, err := ph.projectService.GetAllProject()
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -43,54 +43,22 @@ func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": users})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": projects})
 }
 
-// GetUser godoc
-// @Tags User
-// @Summary 유저 조회
-// @Description 유저 조회
-// @ID GetUser
+// CreateProject godoc
+// @Tags Project
+// @Summary Project 생성
+// @Description Project 생성
+// @ID CreateProject
 // @Accept  json
 // @Produce  json
-// @Param userId path string true "유저 ID"
-// @Router /users/{userId} [get]
-// @Success 200 {object} dto.APIResponse[User]
-// @Failure 500
-func (uh *UserHandler) GetUser(ctx *gin.Context) {
-	userId := ctx.Param("id")
-
-	users, err := uh.userService.GetUser(userId)
-
-	if err != nil {
-		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
-		customErr, ok := err.(*errors.CustomError)
-		if ok {
-			statusCode := customErr.Status()
-			ctx.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": users})
-}
-
-// CreateUser godoc
-// @Tags User
-// @Summary 유저 생성
-// @Description 유저 생성
-// @ID CreateUser
-// @Accept  json
-// @Produce  json
-// @Param user body dto.UserCreateDTO true "유저 정보"
-// @Router /users [post]
+// @Param project body dto.ProjectCreateDTO true "Project 정보"
+// @Router /projects [post]
 // @Success 200 {object} dto.APIResponseWithoutData
 // @Failure 500
-func (uh *UserHandler) CreateUser(ctx *gin.Context) {
-	var dto dto.UserCreateDTO
+func (ph *ProjectHandler) CreateProject(ctx *gin.Context) {
+	var dto dto.ProjectCreateDTO
 
 	//validate the request body
 	if err := ctx.BindJSON(&dto); err != nil {
@@ -104,7 +72,7 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	err := uh.userService.CreateUser(&dto)
+	err := ph.projectService.CreateProject(&dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -122,19 +90,21 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully"})
 }
 
-// UpsertUser godoc
-// @Tags User
-// @Summary 유저 Upsert
-// @Description 유저 생성 or 업데이트
-// @ID UpsertUser
+// UpdateProject godoc
+// @Tags Project
+// @Summary Project 수정
+// @Description Project 수정
+// @ID UpdateProject
 // @Accept  json
 // @Produce  json
-// @Param user body dto.UserUpdateDTO true "유저 정보"
-// @Router /users/upsert [post]
-// @Success 200 {object} dto.APIResponse[User]
+// @Param projectId path string true "Project ID"
+// @Param project body dto.ProjectUpdateDTO true "Project 정보"
+// @Router /projects/{projectId} [patch]
+// @Success 200 {object} dto.APIResponse[Project]
 // @Failure 500
-func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
-	var dto dto.UserUpdateDTO
+func (ph *ProjectHandler) UpdateProject(ctx *gin.Context) {
+	var dto dto.ProjectUpdateDTO
+	projectId := ctx.Param("id")
 
 	//validate the request body
 	if err := ctx.BindJSON(&dto); err != nil {
@@ -148,7 +118,7 @@ func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
 		return
 	}
 
-	result, err := uh.userService.UpsertUser(&dto)
+	project, err := ph.projectService.UpdateProject(projectId, &dto)
 
 	if err != nil {
 		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
@@ -163,5 +133,37 @@ func (uh *UserHandler) UpsertUser(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": result})
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully", "data": project})
+}
+
+// DeleteProject godoc
+// @Tags Project
+// @Summary Project 삭제
+// @Description Project 삭제
+// @ID DeleteProject
+// @Accept  json
+// @Produce  json
+// @Param projectId path string true "Project ID"
+// @Router /projects/{projectId} [delete]
+// @Success 200 {object} dto.APIResponseWithoutData
+// @Failure 500
+func (ph *ProjectHandler) DeleteProject(ctx *gin.Context) {
+	projectId := ctx.Param("id")
+
+	err := ph.projectService.DeleteProject(projectId)
+
+	if err != nil {
+		// CustomError 인터페이스로 형변환이 성공하면 customErr에는 *errors.CustomError 타입의 값이 할당되고, ok 변수에는 true가 할당
+		customErr, ok := err.(*errors.CustomError)
+		if ok {
+			statusCode := customErr.Status()
+			ctx.JSON(statusCode, gin.H{"err": customErr.Err.Error(), "message": customErr.Error()})
+			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "successfully"})
 }

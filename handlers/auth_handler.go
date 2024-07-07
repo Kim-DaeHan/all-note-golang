@@ -18,7 +18,7 @@ type AuthHandler struct {
 	userService services.UserService
 }
 
-func NewAuthController(userService services.UserService) AuthHandler {
+func NewAuthHandler(userService services.UserService) AuthHandler {
 	return AuthHandler{userService}
 }
 

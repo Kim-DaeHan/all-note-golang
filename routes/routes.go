@@ -5,7 +5,6 @@ import (
 
 	"github.com/Kim-DaeHan/all-note-golang/database"
 	"github.com/Kim-DaeHan/all-note-golang/handlers"
-	"github.com/Kim-DaeHan/all-note-golang/services"
 	"github.com/Kim-DaeHan/all-note-golang/services/impl"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,24 +12,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	// user
-	userCollection *mongo.Collection
-	userService    services.UserService
-	userHandler    handlers.UserHandler
-	userRoute      UserRoutes
-
-	// auth
-	authHandler handlers.AuthHandler
-	authRoute   AuthRoutes
-)
-
 func SetupRoutes(router *gin.Engine) {
 	apiGroup := router.Group("/api")
 
 	userRoute.SetUserRoutes(apiGroup)
 	authRoute.SetAuthRoutes(apiGroup, userCollection)
-
+	noteRoute.SetNoteRoutes(apiGroup)
+	todoRoute.SetTodoRoutes(apiGroup)
+	projectRoute.SetProjectRoutes(apiGroup)
+	projectTaskRoute.SetProjectTaskRoutes(apiGroup)
+	meetingRoute.SetMeetingRoutes(apiGroup)
+	jobApplicationRoute.SetJobApplicationRoutes(apiGroup)
 }
 
 func SetDependency(db *mongo.Client) {
@@ -44,16 +36,49 @@ func SetDependency(db *mongo.Client) {
 		},
 	)
 	userService = impl.NewUserServiceImpl(userCollection)
-	userHandler = handlers.NewUserController(userService)
+	userHandler = handlers.NewUserHandler(userService)
 	userRoute = NewUserRoutes(userHandler)
 
 	// auth
-	authHandler = handlers.NewAuthController(userService)
+	authHandler = handlers.NewAuthHandler(userService)
 	authRoute = NewAuthRoutes(authHandler)
-
-	// team
-	// teamCollection = database.GetCollection(db, "teams")
 
 	// department
 	// departmentCollection = database.GetCollection(db, "departments")
+
+	// note
+	noteCollection = database.GetCollection(db, "notes")
+	noteService = impl.NewNoteServiceImpl(noteCollection)
+	noteHandler = handlers.NewNoteHandler(noteService)
+	noteRoute = NewNoteRoutes(noteHandler)
+
+	// todo
+	todoCollection = database.GetCollection(db, "todos")
+	todoService = impl.NewTodoServiceImpl(todoCollection)
+	todoHandler = handlers.NewTodoHandler(todoService)
+	todoRoute = NewTodoRoutes(todoHandler)
+
+	// project
+	projectCollection = database.GetCollection(db, "projects")
+	projectService = impl.NewProjectServiceImpl(projectCollection)
+	projectHandler = handlers.NewProjectHandler(projectService)
+	projectRoute = NewProjectRoutes(projectHandler)
+
+	// project-tasks
+	projectTaskCollection = database.GetCollection(db, "project_tasks")
+	projectTaskService = impl.NewProjectTaskServiceImpl(projectTaskCollection)
+	projectTaskHandler = handlers.NewProjectTaskHandler(projectTaskService)
+	projectTaskRoute = NewProjectTaskRoutes(projectTaskHandler)
+
+	// meeting
+	meetingCollection = database.GetCollection(db, "meetings")
+	meetingService = impl.NewMeetingServiceImpl(meetingCollection)
+	meetingHandler = handlers.NewMeetingHandler(meetingService)
+	meetingRoute = NewMeetingRoutes(meetingHandler)
+
+	// job-application
+	jobApplicationCollection = database.GetCollection(db, "job_applications")
+	jobApplicationService = impl.NewJobApplicationServiceImpl(jobApplicationCollection)
+	jobApplicationHandler = handlers.NewJobApplicationHandler(jobApplicationService)
+	jobApplicationRoute = NewJobApplicationRoutes(jobApplicationHandler)
 }
