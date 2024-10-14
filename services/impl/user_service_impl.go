@@ -120,7 +120,7 @@ func (us *UserServiceImpl) CreateUser(dto *dto.UserCreateDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	fmt.Printf("dto:: %+v", dto)
+	fmt.Printf("dto: %+v", dto)
 
 	user := models.User{
 		ID:        primitive.NewObjectID(),
