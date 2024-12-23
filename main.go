@@ -19,7 +19,7 @@ import (
 // @BasePath /api
 func main() {
 	gin.SetMode(gin.DebugMode)
-	// gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)ㅁ
 
 	// .env 파일 로딩
 	err := godotenv.Load()
